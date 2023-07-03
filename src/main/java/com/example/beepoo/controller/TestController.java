@@ -19,4 +19,10 @@ public class TestController {
 
         return testService.testService(requestDto);
     }
+
+    @GetMapping("/jenkins")
+    public String jenkinsTest() {
+
+        return "Jenkins Test";
+    }
 }
