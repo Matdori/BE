@@ -23,6 +23,6 @@ public class TestController {
     @GetMapping("/jenkins")
     public String jenkinsTest() {
 
-        return "Jenkins Test Please";
+        return "Jenkins Test";
     }
 }
