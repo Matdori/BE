@@ -5,7 +5,9 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -17,12 +19,18 @@ import java.time.LocalDateTime;
 public abstract class TimeStamp {
 
     @CreatedDate
-    private LocalDateTime CREATE_DATE;
+    @Column(updatable = false)
+    private LocalDateTime createDate;
+
+    @CreatedBy
+    @Column(updatable = false)
+    private String createUser;
 
     @LastModifiedDate
-    private LocalDateTime MODIFY_DATE;
+    @Column(updatable = true)
+    private LocalDateTime modifyDate;
 
-    private String CREATE_USER;
-
-    private String MODIFY_USER;
+    @LastModifiedBy
+    @Column(updatable = true)
+    private String modifyUser;
 }
