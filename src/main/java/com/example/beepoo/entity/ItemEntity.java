@@ -22,10 +22,10 @@ public class ItemEntity extends TimeStamp {
     private String name;
 
     @Column(nullable = false)
-    private int itemTypeCode;
+    private int typeCode;
 
     @Column(nullable = false)
-    private int itemStatusCode;
+    private int statusCode;
 
     @Column(nullable = true)
     private String serial;
@@ -35,8 +35,8 @@ public class ItemEntity extends TimeStamp {
 
     public ItemEntity(ItemDto item) {
         this.name = item.getName();
-        this.itemTypeCode = item.getItemTypeCode();
-        this.itemStatusCode = item.getItemStatusCode();
+        this.typeCode = item.getTypeCode();
+        this.statusCode = item.getStatusCode();
         this.serial = item.getSerial();
         this.comment = item.getComment();
     }
