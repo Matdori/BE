@@ -29,7 +29,7 @@ public class DepartmentService {
         Department department = new Department(departmentRequestDto);
 
         //ToDo : 유저 등록 해야함
-        department.setCREATE_USER("유저 이름 넣기");
+        department.setCreateUser("유저 이름 넣기");
         departmentRepository.save(department);
         return 1;
     }

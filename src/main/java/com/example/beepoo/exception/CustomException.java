@@ -3,7 +3,8 @@ package com.example.beepoo.exception;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
 @Getter
-public class CustomException extends RuntimeException{
+@AllArgsConstructor
+public class CustomException extends RuntimeException {
     ErrorCode errorCode;
+}
