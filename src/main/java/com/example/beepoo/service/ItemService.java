@@ -1,8 +1,8 @@
 package com.example.beepoo.service;
 
-import com.example.beepoo.dto.ItemDto;
-import com.example.beepoo.dto.ItemSearchCondition;
-import com.example.beepoo.entity.ItemEntity;
+import com.example.beepoo.dto.ItemRequestDto;
+import com.example.beepoo.dto.ItemResponseDto;
+import com.example.beepoo.entity.Item;
 import com.example.beepoo.exception.CustomException;
 import com.example.beepoo.exception.ErrorCode;
 import com.example.beepoo.repository.ItemCustomRepository;
@@ -23,30 +23,37 @@ public class ItemService {
     private final ItemCustomRepository itemCustomRepository;
 
     @Transactional
-    public ResponseEntity<List<ItemDto>> getItemList(ItemSearchCondition condition, Pageable pageable) {
-        List<ItemDto> result = itemCustomRepository.getItemList(condition, pageable);
+    public ResponseEntity<List<ItemResponseDto>> getItemList(ItemRequestDto condition, Pageable pageable) {
+        List<ItemResponseDto> result = itemCustomRepository.getItemList(condition, pageable);
 
         return ResponseEntity.ok(result);
     }
 
     @Transactional
-    public ResponseEntity<ItemDto> getItem(int seq) {
+    public ResponseEntity<ItemResponseDto> getItem(int seq) {
         // TODO(337): 사용 내역 추가 필요
-        ItemEntity item = itemRepository.findById((long) seq).orElseThrow(
+        Item item = itemRepository.findById((long) seq).orElseThrow(
                 () -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
-        ItemDto result = new ItemDto(item);
+        ItemResponseDto result = new ItemResponseDto(item);
 
         return ResponseEntity.ok().body(result);
     }
 
     @Transactional
-    public ResponseEntity<String> insertItemList(ItemDto[] itemDtos) {
-        for(ItemDto item : itemDtos){
-            ItemEntity itemEntity = new ItemEntity(item);
-            itemRepository.save(itemEntity);
+    public ResponseEntity<String> insertItemList(ItemRequestDto[] itemDtos) {
+        for(ItemRequestDto itemDto : itemDtos){
+            Item item = new Item(itemDto);
+            itemRepository.save(item);
         }
 
         return ResponseEntity.ok().body("비품 등록 성공");
+    }
+
+    @Transactional
+    public ResponseEntity<String> updateItem(ItemRequestDto itemDto) {
+        itemCustomRepository.updateItem(itemDto);
+
+        return ResponseEntity.ok().body("비품 수정 성공");
     }
 }

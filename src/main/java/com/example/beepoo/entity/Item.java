@@ -1,6 +1,6 @@
 package com.example.beepoo.entity;
 
-import com.example.beepoo.dto.ItemDto;
+import com.example.beepoo.dto.ItemRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,20 +12,20 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemEntity extends TimeStamp {
+public class Item extends TimeStamp {
 
     @Id
     @GeneratedValue()
-    private int seq;
+    private Integer seq;
 
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
-    private int typeCode;
+    private Integer typeCode;
 
     @Column(nullable = false)
-    private int statusCode;
+    private Integer statusCode;
 
     @Column(nullable = true)
     private String serial;
@@ -33,7 +33,7 @@ public class ItemEntity extends TimeStamp {
     @Column(nullable = true)
     private String comment;
 
-    public ItemEntity(ItemDto item) {
+    public Item(ItemRequestDto item) {
         this.name = item.getName();
         this.typeCode = item.getTypeCode();
         this.statusCode = item.getStatusCode();

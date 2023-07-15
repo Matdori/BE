@@ -1,17 +1,19 @@
 package com.example.beepoo.dto;
 
-import com.example.beepoo.entity.ItemEntity;
+import com.example.beepoo.entity.Item;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Data
-public class ItemDto {
-    private int seq;
+@Getter
+@NoArgsConstructor
+public class ItemResponseDto {
+    private Integer seq;
     private String name;
-    private int typeCode;
-    private int statusCode;
+    private Integer typeCode;
+    private Integer statusCode;
     private String serial;
     private String comment;
     private LocalDateTime createDate;
@@ -19,7 +21,7 @@ public class ItemDto {
     private LocalDateTime modifyDate;
     private String modifyUser;
 
-    public ItemDto(ItemEntity entity){
+    public ItemResponseDto(Item entity){
         this.seq = entity.getSeq();
         this.name = entity.getName();
         this.typeCode = entity.getTypeCode();
@@ -33,7 +35,7 @@ public class ItemDto {
     }
 
     @QueryProjection
-    public ItemDto(int seq, String name, int typeCode, int statusCode, String serial, String comment, LocalDateTime createDate, String createUser, LocalDateTime modifyDate, String modifyUser) {
+    public ItemResponseDto(Integer seq, String name, Integer typeCode, Integer statusCode, String serial, String comment, LocalDateTime createDate, String createUser, LocalDateTime modifyDate, String modifyUser) {
         this.seq = seq;
         this.name = name;
         this.typeCode = typeCode;
@@ -46,4 +48,3 @@ public class ItemDto {
         this.modifyUser = modifyUser;
     }
 }
-

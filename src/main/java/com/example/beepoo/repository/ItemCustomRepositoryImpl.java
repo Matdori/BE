@@ -1,13 +1,14 @@
 package com.example.beepoo.repository;
 
-import com.example.beepoo.dto.ItemDto;
-import com.example.beepoo.dto.ItemSearchCondition;
-import com.example.beepoo.dto.QItemDto;
+import com.example.beepoo.dto.ItemRequestDto;
+import com.example.beepoo.dto.ItemResponseDto;
+import com.example.beepoo.dto.QItemResponseDto;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAUpdateClause;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.example.beepoo.entity.QItemEntity.itemEntity;
+import static com.example.beepoo.entity.QItem.item;
 import static org.springframework.util.StringUtils.hasText;
 
 @Repository
@@ -28,20 +29,20 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
     }
 
     @Override
-    public List<ItemDto> getItemList(ItemSearchCondition condition, Pageable pageable){
-        List<ItemDto> itemList = jpaQueryFactory
-                .select(new QItemDto(
-                        itemEntity.seq,
-                        itemEntity.name,
-                        itemEntity.typeCode,
-                        itemEntity.statusCode,
-                        itemEntity.serial,
-                        itemEntity.comment,
-                        itemEntity.createDate,
-                        itemEntity.createUser,
-                        itemEntity.modifyDate,
-                        itemEntity.modifyUser))
-                .from(itemEntity)
+    public List<ItemResponseDto> getItemList(ItemRequestDto condition, Pageable pageable){
+        List<ItemResponseDto> itemList = jpaQueryFactory
+                .select(new QItemResponseDto(
+                        item.seq,
+                        item.name,
+                        item.typeCode,
+                        item.statusCode,
+                        item.serial,
+                        item.comment,
+                        item.createDate,
+                        item.createUser,
+                        item.modifyDate,
+                        item.modifyUser))
+                .from(item)
                 .where(
                         nameEq(condition.getName()),
                         typeCodeEq(condition.getTypeCode()),
@@ -62,8 +63,8 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
         int itemCnt = itemList.size();
         // 전체 개수
         long totalItemCnt = jpaQueryFactory
-                .select(itemEntity.count())
-                .from(itemEntity)
+                .select(item.count())
+                .from(item)
                 .where(
                         nameEq(condition.getName()),
                         typeCodeEq(condition.getTypeCode()),
@@ -80,24 +81,47 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
         return itemList;
     }
 
+    @Override
+    public void updateItem(ItemRequestDto itemDto) {
+        JPAUpdateClause clause = jpaQueryFactory
+                .update(item)
+                .where(item.seq.eq(itemDto.getSeq()));
+                if (hasText(itemDto.getName())) {
+                    clause.set(item.name, itemDto.getName());
+                }
+                if (itemDto.getTypeCode() != null) {
+                    clause.set(item.typeCode, itemDto.getTypeCode());
+                }
+                if (itemDto.getStatusCode() != null) {
+                    clause.set(item.statusCode, itemDto.getStatusCode());
+                }
+                if (hasText(itemDto.getSerial())) {
+                    clause.set(item.serial, itemDto.getSerial());
+                }
+                if (hasText(itemDto.getComment())) {
+                    clause.set(item.comment, itemDto.getComment());
+                }
+        clause.execute();
+    }
+
     private BooleanExpression nameEq(String name) {
-        return hasText(name) ? itemEntity.name.contains(name) : null;
+        return hasText(name) ? item.name.contains(name) : null;
     }
 
-    private BooleanExpression typeCodeEq(String typeCode) {
-        return hasText(typeCode) ? itemEntity.typeCode.in(Integer.parseInt(typeCode)) : null;
+    private BooleanExpression typeCodeEq(Integer typeCode) {
+        return typeCode != null ? item.typeCode.in(typeCode) : null;
     }
 
-    private BooleanExpression statusCodeEq(String statusCode) {
-        return hasText(statusCode) ? itemEntity.statusCode.in(Integer.parseInt(statusCode)) : null;
+    private BooleanExpression statusCodeEq(Integer statusCode) {
+        return statusCode != null ? item.statusCode.in(statusCode) : null;
     }
 
     private BooleanExpression serialEq(String serial) {
-        return hasText(serial) ? itemEntity.serial.contains(serial) : null;
+        return hasText(serial) ? item.serial.contains(serial) : null;
     }
 
     private BooleanExpression commentEq(String comment) {
-        return hasText(comment) ? itemEntity.comment.contains(comment) : null;
+        return hasText(comment) ? item.comment.contains(comment) : null;
     }
 
     private BooleanExpression createDateRangeEq(String createDateRange) {
@@ -107,14 +131,14 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
             LocalDateTime startDate = LocalDateTime.parse(createDateRange.split("~")[0], formatter);
             LocalDateTime endDate = LocalDateTime.parse(createDateRange.split("~")[1], formatter);
 
-            return itemEntity.createDate.between(startDate, endDate);
+            return item.createDate.between(startDate, endDate);
         }else{
             return null;
         }
     }
 
     private BooleanExpression createUserEq(String createUser) {
-        return hasText(createUser) ? itemEntity.createUser.contains(createUser) : null;
+        return hasText(createUser) ? item.createUser.contains(createUser) : null;
     }
 
     private BooleanExpression modifyDateRangeEq(String modifyDateRange) {
@@ -124,14 +148,14 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
             LocalDateTime startDate = LocalDateTime.parse(modifyDateRange.split("~")[0], formatter);
             LocalDateTime endDate = LocalDateTime.parse(modifyDateRange.split("~")[1], formatter);
 
-            return itemEntity.modifyDate.between(startDate, endDate);
+            return item.modifyDate.between(startDate, endDate);
         }else{
             return null;
         }
     }
 
     private BooleanExpression modifyUserEq(String modifyUser) {
-        return hasText(modifyUser) ? itemEntity.modifyUser.contains(modifyUser) : null;
+        return hasText(modifyUser) ? item.modifyUser.contains(modifyUser) : null;
     }
 
     private OrderSpecifier OrderBy(Pageable pageable) {
@@ -144,7 +168,7 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
         // 정렬 옵션이 있는 경우
         OrderSpecifier result = null;
         for (Sort.Order o : pageable.getSort()) {
-            PathBuilder pathBuilder = new PathBuilder(itemEntity.getType(), itemEntity.getMetadata());
+            PathBuilder pathBuilder = new PathBuilder(item.getType(), item.getMetadata());
 
             result = new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
                 pathBuilder.get(o.getProperty()));

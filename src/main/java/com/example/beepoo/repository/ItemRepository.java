@@ -1,8 +1,8 @@
 package com.example.beepoo.repository;
 
-import com.example.beepoo.entity.ItemEntity;
+import com.example.beepoo.entity.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
+public interface ItemRepository extends JpaRepository<Item, Long> {
 
 }
