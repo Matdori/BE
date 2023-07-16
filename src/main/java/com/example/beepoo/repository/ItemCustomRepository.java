@@ -10,4 +10,6 @@ public interface ItemCustomRepository {
     List<ItemResponseDto> getItemList(ItemRequestDto condition, Pageable pageable);
 
     void updateItem(ItemRequestDto itemDto);
+
+    void deleteItem(List<Integer> seqs);
 }

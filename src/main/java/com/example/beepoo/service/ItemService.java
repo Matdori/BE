@@ -1,5 +1,6 @@
 package com.example.beepoo.service;
 
+import com.example.beepoo.dto.GlobalResponseDto;
 import com.example.beepoo.dto.ItemRequestDto;
 import com.example.beepoo.dto.ItemResponseDto;
 import com.example.beepoo.entity.Item;
@@ -9,7 +10,6 @@ import com.example.beepoo.repository.ItemCustomRepository;
 import com.example.beepoo.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,37 +23,44 @@ public class ItemService {
     private final ItemCustomRepository itemCustomRepository;
 
     @Transactional
-    public ResponseEntity<List<ItemResponseDto>> getItemList(ItemRequestDto condition, Pageable pageable) {
-        List<ItemResponseDto> result = itemCustomRepository.getItemList(condition, pageable);
+    public GlobalResponseDto<List<ItemResponseDto>> getItemList(ItemRequestDto condition, Pageable pageable) {
+        List<ItemResponseDto> itemList = itemCustomRepository.getItemList(condition, pageable);
 
-        return ResponseEntity.ok(result);
+        return GlobalResponseDto.ok("비품 목록 조회 성공", itemList);
     }
 
     @Transactional
-    public ResponseEntity<ItemResponseDto> getItem(int seq) {
+    public GlobalResponseDto<ItemResponseDto> getItem(Integer seq) {
         // TODO(337): 사용 내역 추가 필요
-        Item item = itemRepository.findById((long) seq).orElseThrow(
+        Item itemEntity = itemRepository.findById((long) seq).orElseThrow(
                 () -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
-        ItemResponseDto result = new ItemResponseDto(item);
+        ItemResponseDto item = new ItemResponseDto(itemEntity);
 
-        return ResponseEntity.ok().body(result);
+        return GlobalResponseDto.ok("비품 상세 조회 성공", item);
     }
 
     @Transactional
-    public ResponseEntity<String> insertItemList(ItemRequestDto[] itemDtos) {
+    public GlobalResponseDto<String> insertItemList(ItemRequestDto[] itemDtos) {
         for(ItemRequestDto itemDto : itemDtos){
             Item item = new Item(itemDto);
             itemRepository.save(item);
         }
 
-        return ResponseEntity.ok().body("비품 등록 성공");
+        return GlobalResponseDto.ok("비품 등록 성공");
     }
 
     @Transactional
-    public ResponseEntity<String> updateItem(ItemRequestDto itemDto) {
+    public GlobalResponseDto updateItem(ItemRequestDto itemDto) {
         itemCustomRepository.updateItem(itemDto);
 
-        return ResponseEntity.ok().body("비품 수정 성공");
+        return GlobalResponseDto.ok("비품 수정 성공");
+    }
+
+    @Transactional
+    public GlobalResponseDto deleteItem(List<Integer> seqs) {
+        itemCustomRepository.deleteItem(seqs);
+
+        return GlobalResponseDto.ok("비품 삭제 성공");
     }
 }

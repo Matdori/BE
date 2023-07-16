@@ -104,6 +104,14 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
         clause.execute();
     }
 
+    @Override
+    public void deleteItem(List<Integer> seqs) {
+        long count = jpaQueryFactory
+                .delete(item)
+                .where(item.seq.in(seqs))
+                .execute();
+    }
+
     private BooleanExpression nameEq(String name) {
         return hasText(name) ? item.name.contains(name) : null;
     }
