@@ -18,7 +18,7 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    // 비품 조회
+    // 비품 목록 조회
     @GetMapping("/item")
     @ResponseStatus(HttpStatus.OK)
     public GlobalResponseDto<List<ItemResponseDto>> getItemList(ItemRequestDto condition, Pageable pageable) {

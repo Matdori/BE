@@ -32,7 +32,7 @@ public class ItemService {
     @Transactional
     public GlobalResponseDto<ItemResponseDto> getItem(Integer seq) {
         // TODO(337): 사용 내역 추가 필요
-        Item itemEntity = itemRepository.findById((long) seq).orElseThrow(
+        Item itemEntity = itemRepository.findById(seq).orElseThrow(
                 () -> new CustomException(ErrorCode.ITEM_NOT_FOUND));
 
         ItemResponseDto item = new ItemResponseDto(itemEntity);
