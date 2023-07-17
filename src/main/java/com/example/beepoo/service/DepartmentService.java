@@ -24,11 +24,11 @@ public class DepartmentService {
     public int createDepartment (DepartmentRequestDto departmentRequestDto) {
 
         if (departmentRepository.existsByDepartmentName(departmentRequestDto.getDepartmentName())) {
-            throw new CustomException(ErrorCode.AlreadyExistDepartment);
+            throw new CustomException(ErrorCode.DEPARTMENT_ALREADY_EXIST);
         }
         Department department = new Department(departmentRequestDto);
 
-        //ToDo : 유저 등록 해야함
+        //ToDo[07] : 유저 등록 해야함
         department.setCreateUser("유저 이름 넣기");
         departmentRepository.save(department);
         return 1;
@@ -45,7 +45,7 @@ public class DepartmentService {
 
     @Transactional
     public GlobalResponseDto deleteDepartment(Long departmentId) {
-        //ToDo : 존재하는 아이디인지 먼저 확인 해야할까
+        //ToDo[07] : 존재하는 아이디인지 먼저 확인 해야할까
         departmentRepository.deleteById(departmentId);
         return GlobalResponseDto.ok("삭제했슈");
     }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/team")
+@RequestMapping("/api/department")
 @RequiredArgsConstructor
 public class DepartmentController {
     private final DepartmentService departmentService;
@@ -25,7 +25,7 @@ public class DepartmentController {
     }
 
     //부서 수정
-    @PutMapping
+    @PutMapping("/{departmentId}")
     @ResponseStatus(HttpStatus.OK)
     public GlobalResponseDto<DepartmentResponseDto> updateDepartment(@PathVariable Long departmentId,
                                                                      @RequestBody DepartmentRequestDto departmentRequestDto) {
