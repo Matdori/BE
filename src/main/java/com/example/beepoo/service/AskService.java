@@ -112,4 +112,9 @@ public class AskService {
 
         return GlobalResponseDto.ok("요청 처리 성공");
     }
+
+    @Transactional
+    public GlobalResponseDto<Long> getAskCount() {
+        return GlobalResponseDto.ok("요청 현황 건수", askRepository.countAskByType(AskTypeEnum.ASK));
+    }
 }

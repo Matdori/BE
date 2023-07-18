@@ -59,4 +59,10 @@ public class AskController {
     public GlobalResponseDto confirmAsk(@RequestBody AskRequestDto askDto) {
         return askService.confirmAsk(askDto);
     }
+
+    //요청 현황 건수 (대시보드) 필요 시 목록
+    @GetMapping("/ask/count")
+    public GlobalResponseDto<Long> getAskCount(){
+        return askService.getAskCount();
+    }
 }
