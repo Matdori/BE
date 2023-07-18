@@ -4,6 +4,7 @@ import com.example.beepoo.dto.AskRequestDto;
 import com.example.beepoo.dto.AskResponseDto;
 import com.example.beepoo.dto.QAskResponseDto;
 import com.example.beepoo.enums.AskTypeEnum;
+import com.example.beepoo.util.OrderByNull;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -18,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.example.beepoo.entity.QAsk.ask;
+import static com.example.beepoo.entity.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
 
 @Repository
@@ -27,6 +29,8 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
     public AskCustomRepositoryImpl(JPAQueryFactory jpaQueryFactory) {
         this.jpaQueryFactory = jpaQueryFactory;
     }
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public List<AskResponseDto> getAskList(AskRequestDto condition, Pageable pageable) {
@@ -45,6 +49,7 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
                         ask.modifyDate,
                         ask.modifyUser))
                 .from(ask)
+                .leftJoin(ask.confirmUser, user)
                 .where(
                         typeEq(condition.getAskType()),
                         createDateRangeEq(condition.getCreateDate()),
@@ -69,11 +74,12 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
     }
 
     private BooleanExpression createDateRangeEq(String createDateRange) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
         if(hasText(createDateRange)){
-            LocalDateTime startDate = LocalDateTime.parse(createDateRange.split("~")[0], formatter);
-            LocalDateTime endDate = LocalDateTime.parse(createDateRange.split("~")[1], formatter);
+            String start = createDateRange.split("~")[0] + " 00:00:00";
+            String end = createDateRange.split("~")[1] + " 23:59:59";
+
+            LocalDateTime startDate = LocalDateTime.parse(start, formatter);
+            LocalDateTime endDate = LocalDateTime.parse(end, formatter);
 
             return ask.createDate.between(startDate, endDate);
         }else{
@@ -86,11 +92,12 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
     }
 
     private BooleanExpression modifyDateRangeEq(String modifyDateRange) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
         if(hasText(modifyDateRange)){
-            LocalDateTime startDate = LocalDateTime.parse(modifyDateRange.split("~")[0], formatter);
-            LocalDateTime endDate = LocalDateTime.parse(modifyDateRange.split("~")[1], formatter);
+            String start = modifyDateRange.split("~")[0] + " 00:00:00";
+            String end = modifyDateRange.split("~")[1] + " 23:59:59";
+
+            LocalDateTime startDate = LocalDateTime.parse(start, formatter);
+            LocalDateTime endDate = LocalDateTime.parse(end, formatter);
 
             return ask.modifyDate.between(startDate, endDate);
         }else{
@@ -103,19 +110,19 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
     }
 
     private OrderSpecifier OrderBy(Pageable pageable) {
+        OrderSpecifier result = OrderByNull.getDefault();
         Sort sort = pageable.getSort();
+
         // 정렬 옵션이 없는 경우
         if(Sort.unsorted().equals(sort)){
-            return null;
+            return result;
         }
 
         // 정렬 옵션이 있는 경우
-        OrderSpecifier result = null;
         for (Sort.Order o : pageable.getSort()) {
             PathBuilder pathBuilder = new PathBuilder(ask.getType(), ask.getMetadata());
 
-            result = new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
-                    pathBuilder.get(o.getProperty()));
+            result = new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC, pathBuilder.get(o.getProperty()));
         }
 
         return result;

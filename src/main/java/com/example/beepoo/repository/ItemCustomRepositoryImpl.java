@@ -3,6 +3,7 @@ package com.example.beepoo.repository;
 import com.example.beepoo.dto.ItemRequestDto;
 import com.example.beepoo.dto.ItemResponseDto;
 import com.example.beepoo.dto.QItemResponseDto;
+import com.example.beepoo.util.OrderByNull;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -27,6 +28,8 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
     public ItemCustomRepositoryImpl(JPAQueryFactory jpaQueryFactory) {
         this.jpaQueryFactory = jpaQueryFactory;
     }
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
     public List<ItemResponseDto> getItemList(ItemRequestDto condition, Pageable pageable){
@@ -133,11 +136,12 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
     }
 
     private BooleanExpression createDateRangeEq(String createDateRange) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String start = createDateRange.split("~")[0] + " 00:00:00";
+        String end = createDateRange.split("~")[1] + " 23:59:59";
 
         if(hasText(createDateRange)){
-            LocalDateTime startDate = LocalDateTime.parse(createDateRange.split("~")[0], formatter);
-            LocalDateTime endDate = LocalDateTime.parse(createDateRange.split("~")[1], formatter);
+            LocalDateTime startDate = LocalDateTime.parse(start, formatter);
+            LocalDateTime endDate = LocalDateTime.parse(end, formatter);
 
             return item.createDate.between(startDate, endDate);
         }else{
@@ -150,11 +154,12 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
     }
 
     private BooleanExpression modifyDateRangeEq(String modifyDateRange) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String start = modifyDateRange.split("~")[0] + " 00:00:00";
+        String end = modifyDateRange.split("~")[1] + " 23:59:59";
 
         if(hasText(modifyDateRange)){
-            LocalDateTime startDate = LocalDateTime.parse(modifyDateRange.split("~")[0], formatter);
-            LocalDateTime endDate = LocalDateTime.parse(modifyDateRange.split("~")[1], formatter);
+            LocalDateTime startDate = LocalDateTime.parse(start, formatter);
+            LocalDateTime endDate = LocalDateTime.parse(end, formatter);
 
             return item.modifyDate.between(startDate, endDate);
         }else{
@@ -167,19 +172,19 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
     }
 
     private OrderSpecifier OrderBy(Pageable pageable) {
+        OrderSpecifier result = OrderByNull.getDefault();
         Sort sort = pageable.getSort();
+
         // 정렬 옵션이 없는 경우
         if(Sort.unsorted().equals(sort)){
-            return null;
+            return result;
         }
 
         // 정렬 옵션이 있는 경우
-        OrderSpecifier result = null;
         for (Sort.Order o : pageable.getSort()) {
             PathBuilder pathBuilder = new PathBuilder(item.getType(), item.getMetadata());
 
-            result = new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC,
-                pathBuilder.get(o.getProperty()));
+            result = new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC, pathBuilder.get(o.getProperty()));
         }
         
         return result;
