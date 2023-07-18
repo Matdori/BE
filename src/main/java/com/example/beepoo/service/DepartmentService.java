@@ -61,7 +61,7 @@ public class DepartmentService {
         List<Department> departmentList = departmentRepository.findAll();
         List<DepartmentResponseDto> departmentResponseDtoList = new ArrayList<>();
         for (Department department : departmentList) {
-            departmentResponseDtoList.add(new DepartmentResponseDto(department));
+            departmentResponseDtoList.add(new DepartmentResponseDto(department, department.getUserCount()));
         }
         return GlobalResponseDto.ok("리스트 조회", departmentResponseDtoList);
     }
