@@ -39,7 +39,7 @@ public class UserService {
         //부서 먼저 찾기
         Department department = departmentRepository.findDepartmentByDepartmentName(userRequestDto.getDepartmentName())
                 .orElseThrow(()-> new CustomException(ErrorCode.DEPARTMENT_NOT_FOUND));
-        System.out.println(department.getUserList().size());
+
         User user = new User(userRequestDto);
         user.setDepartment(department);
         department.setUserCount(department.getUserCount() + 1);

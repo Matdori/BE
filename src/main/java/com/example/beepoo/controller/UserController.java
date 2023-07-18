@@ -4,6 +4,7 @@ import com.example.beepoo.dto.GlobalResponseDto;
 import com.example.beepoo.dto.UserRequestDto;
 import com.example.beepoo.dto.UserResponseDto;
 import com.example.beepoo.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ public class UserController {
 
     //사원 등록
     @PostMapping
-    public GlobalResponseDto<UserResponseDto> createUser(@RequestBody UserRequestDto userRequestDto) {
+    public GlobalResponseDto<UserResponseDto> createUser(@RequestBody @Valid UserRequestDto userRequestDto) {
         return userService.createUser(userRequestDto);
     }
 
