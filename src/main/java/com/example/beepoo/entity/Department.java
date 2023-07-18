@@ -1,6 +1,8 @@
 package com.example.beepoo.entity;
 
 import com.example.beepoo.dto.DepartmentRequestDto;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +15,7 @@ import java.util.List;
 @Table(name = "department")
 @NoArgsConstructor
 @Getter @Setter
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Department extends TimeStamp {
 
     @Id
