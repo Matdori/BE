@@ -47,6 +47,11 @@ public class UserController {
         return userService.getUserListByDepartment(departmentName);
     }
 
+
+    //비밀번호 변경
+    //Todo[07] : jwt 이후 비밀번호 변경 구현
+
+
     // 이메일 중복 체크
     @GetMapping("/checkEmail/{email}")
     public GlobalResponseDto<Boolean> checkUserEmail(@PathVariable String email) {

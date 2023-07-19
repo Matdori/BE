@@ -1,35 +1,37 @@
 package com.example.beepoo.entity;
 
 import com.example.beepoo.dto.UserRequestDto;
+import com.example.beepoo.enums.UserRoleEnum;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
-public class User extends TimeStamp{
+public class User extends TimeStamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String userName;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String userEmail;
 
-    @Column
+    @Column(nullable = false)
     private String userPassword;
 
-    @Column
+    @Column(nullable = false)
     private String position;
 
-    @Column
-    private String authority;
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private UserRoleEnum userRole;
 
     @Column
     private String departmentName;
@@ -38,20 +40,20 @@ public class User extends TimeStamp{
     @ManyToOne
     private Department department;
 
-    public User(UserRequestDto userRequestDto){
+    public User(UserRequestDto userRequestDto, String encodedPassword) {
         this.userName = userRequestDto.getUserName();
         this.userEmail = userRequestDto.getUserEmail();
-        this.userPassword = userRequestDto.getUserPassword();
+        this.userPassword = encodedPassword;
         this.position = userRequestDto.getPosition();
-        this.authority = userRequestDto.getAuthority();
+        this.userRole = userRequestDto.isAdmin() ? UserRoleEnum.ADMIN : UserRoleEnum.USER;
         this.departmentName = userRequestDto.getDepartmentName();
     }
-    public void updateUser(UserRequestDto userRequestDto){
+
+    public void updateUser(UserRequestDto userRequestDto) {
         this.userName = userRequestDto.getUserName();
         this.userEmail = userRequestDto.getUserEmail();
-        this.userPassword = userRequestDto.getUserPassword();
         this.position = userRequestDto.getPosition();
-        this.authority = userRequestDto.getAuthority();
+        this.userRole = userRequestDto.isAdmin() ? UserRoleEnum.ADMIN : UserRoleEnum.USER;
         this.departmentName = userRequestDto.getDepartmentName();
     }
 

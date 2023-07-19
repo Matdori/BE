@@ -16,11 +16,14 @@ public class UserResponseDto{
 
     private String department;
 
+    private String role;
+
 
     public UserResponseDto(User user){
         this.userName = user.getUserName();
         this.userEmail = user.getUserEmail();
         this.position = user.getPosition();
         this.department = user.getDepartmentName();
+        this.role = user.getUserRole().toString();
     }
 }
