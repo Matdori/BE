@@ -13,55 +13,55 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/ask")
 public class AskController {
 
     private final AskService askService;
 
     // 요청 목록 조회
-    @GetMapping("/ask")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public GlobalResponseDto<List<AskResponseDto>> getAskList(AskRequestDto condition, Pageable pageable) {
         return askService.getAskList(condition, pageable);
     }
 
     // 요청 상세 조회
-    @GetMapping("/ask/detail")
+    @GetMapping("/detail")
     @ResponseStatus(HttpStatus.OK)
     public GlobalResponseDto<AskResponseDto> getAsk(@RequestParam("seq") Integer seq) {
         return askService.getAsk(seq);
     }
 
     // 요청 등록
-    @PostMapping("/ask")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public GlobalResponseDto insertAsk(@RequestBody AskRequestDto askDto) {
         return askService.insertAsk(askDto);
     }
 
     // 요청 수정
-    @PatchMapping("/ask")
+    @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public GlobalResponseDto updateAsk(@RequestBody AskRequestDto askDto) {
         return askService.updateAsk(askDto);
     }
 
     // 요청 취소
-    @PatchMapping("/ask/cancel")
+    @PatchMapping("/cancel")
     @ResponseStatus(HttpStatus.OK)
     public GlobalResponseDto cancelAsk(@RequestBody AskRequestDto askDto) {
         return askService.cancelAsk(askDto);
     }
 
     // 요청 확인(처리)
-    @PatchMapping("/ask/confirm")
+    @PatchMapping("/confirm")
     @ResponseStatus(HttpStatus.OK)
     public GlobalResponseDto confirmAsk(@RequestBody AskRequestDto askDto) {
         return askService.confirmAsk(askDto);
     }
 
     //요청 현황 건수 (대시보드) 필요 시 목록
-    @GetMapping("/ask/count")
+    @GetMapping("/count")
     public GlobalResponseDto<Long> getAskCount(){
         return askService.getAskCount();
     }

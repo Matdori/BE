@@ -13,13 +13,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/item")
 public class ItemController {
 
     private final ItemService itemService;
 
     // 비품 목록 조회
-    @GetMapping("/item")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public GlobalResponseDto<List<ItemResponseDto>> getItemList(ItemRequestDto condition, Pageable pageable) {
 
@@ -27,29 +27,36 @@ public class ItemController {
     }
 
     // 비품 상세 조회
-    @GetMapping("/item/detail")
+    @GetMapping("/detail")
     @ResponseStatus(HttpStatus.OK)
     public GlobalResponseDto<ItemResponseDto> getItem(@RequestParam("seq") Integer seq) {
         return itemService.getItem(seq);
     }
     // 비품 등록
-    @PostMapping("/item")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public GlobalResponseDto insertItemList(@RequestBody ItemRequestDto[] itemDtos) {
         return itemService.insertItemList(itemDtos);
     }
 
     // 비품 수정
-    @PatchMapping("/item")
+    @PatchMapping
     @ResponseStatus(HttpStatus.OK)
     public GlobalResponseDto updateItem(@RequestBody ItemRequestDto itemDto) {
         return itemService.updateItem(itemDto);
     }
 
     // 비품 삭제
-    @DeleteMapping("/item")
+    @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
     public GlobalResponseDto deleteItem(@RequestParam("seqs") List<Integer> seqs) {
         return itemService.deleteItem(seqs);
+    }
+    
+    // 비품명 중복 체크
+    @GetMapping("/checkName/{name}")
+    @ResponseStatus(HttpStatus.OK)
+    public GlobalResponseDto<Boolean> checkItemName(@PathVariable String name) {
+        return itemService.checkItemName(name);
     }
 }
