@@ -63,4 +63,13 @@ public class ItemService {
 
         return GlobalResponseDto.ok("비품 삭제 성공");
     }
+
+    @Transactional
+    public GlobalResponseDto<Boolean> checkItemName(String name) {
+        if(itemRepository.existsByName(name)){
+            return GlobalResponseDto.ok("중복된 비품명", false);
+        }else{
+            return GlobalResponseDto.ok("사용 가능한 비품명", true);
+        }
+    }
 }

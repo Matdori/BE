@@ -65,4 +65,13 @@ public class DepartmentService {
         }
         return GlobalResponseDto.ok("리스트 조회", departmentResponseDtoList);
     }
+
+    @Transactional
+    public GlobalResponseDto<Boolean> checkDepartmentName(String name) {
+        if(departmentRepository.existsByDepartmentName(name)){
+            return GlobalResponseDto.ok("중복된 부서명", false);
+        }else{
+            return GlobalResponseDto.ok("사용 가능한 부서명", true);
+        }
+    }
 }
