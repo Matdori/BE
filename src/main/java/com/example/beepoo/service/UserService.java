@@ -92,4 +92,13 @@ public class UserService {
         }
         return GlobalResponseDto.ok("조회 성공", dtoList);
     }
+
+    @Transactional
+    public GlobalResponseDto<Boolean> checkUserEmail(String email) {
+        if(userRepository.existsByUserEmail(email)){
+            return GlobalResponseDto.ok("중복된 이메일", false);
+        }else{
+            return GlobalResponseDto.ok("사용 가능한 이메일", true);
+        }
+    }
 }

@@ -1,5 +1,17 @@
 package com.example.beepoo.enums;
 
 public enum ItemStatusEnum {
-    ASSIGNED, DISCARD
+    REGISTERED("registered"),
+    ASSIGNED("assigned"),
+    DISCARD("discard");
+
+    private final String status;
+
+    ItemStatusEnum(String status) {
+        this.status = status;
+    }
+
+    public String status() {
+        return status;
+    }
 }

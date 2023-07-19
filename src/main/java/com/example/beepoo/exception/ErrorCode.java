@@ -15,6 +15,8 @@ public enum ErrorCode {
     DEPARTMENT_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "I001", "해당 부서를 찾을 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "U001", "존재하지 않는 사용자 입니다."),
     ITEM_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "I001", "해당 비품을 찾을 수 없습니다."),
+    ITEM_ALREADY_ASSIGNED(HttpStatus.CONFLICT.value(), "I002", "이미 할당된 비품입니다."),
+    ITEM_ALREADY_DISCARD(HttpStatus.CONFLICT.value(), "I002", "이미 폐기된 비품입니다."),
     ASK_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "A001", "존재하지 않는 요청입니다."),
     ASK_ALREADY_CONFIRM(HttpStatus.INTERNAL_SERVER_ERROR.value(), "A002", "이미 처리된 요청입니다.");
 

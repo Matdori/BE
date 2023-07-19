@@ -47,9 +47,16 @@ public class UserController {
         return userService.getUserListByDepartment(departmentName);
     }
 
+
     //비밀번호 변경
     //Todo[07] : jwt 이후 비밀번호 변경 구현
 
+
+    // 이메일 중복 체크
+    @GetMapping("/checkEmail/{email}")
+    public GlobalResponseDto<Boolean> checkUserEmail(@PathVariable String email) {
+        return userService.checkUserEmail(email);
+    }
 
     //내 정보 조회
     //ToDo[07] : 인증 방식에 따라 달라질 예정

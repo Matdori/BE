@@ -54,4 +54,10 @@ public class DepartmentController {
         return departmentService.getDepartmentList();
     }
 
+    // 부서명 중복 체크
+    @GetMapping("/checkName/{name}")
+    @ResponseStatus(HttpStatus.OK)
+    public GlobalResponseDto<Boolean> checkDepartmentName(@PathVariable String name) {
+        return departmentService.checkDepartmentName(name);
+    }
 }
