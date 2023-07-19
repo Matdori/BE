@@ -6,14 +6,15 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Ask extends TimeStamp {
 
     @Id
-    @GeneratedValue()
+    @GeneratedValue
     private Integer seq;
 
     @JoinColumn
@@ -21,6 +22,7 @@ public class Ask extends TimeStamp {
     private Item item;
 
     @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
     private AskTypeEnum type;
 
     @JoinColumn
@@ -48,18 +50,18 @@ public class Ask extends TimeStamp {
         this.askImg = ask.getAskImg();
     }
 
-    public void updateAsk(AskRequestDto ask){
+    public void updateAsk(AskRequestDto ask) {
         this.seq = ask.getSeq();
         this.askMsg = ask.getAskMsg();
         this.askImg = ask.getAskImg();
     }
 
-    public void cancelAsk(AskRequestDto ask){
+    public void cancelAsk(AskRequestDto ask) {
         this.seq = ask.getSeq();
         this.type = AskTypeEnum.CANCEL;
     }
 
-    public void confirmAsk(AskRequestDto ask){
+    public void confirmAsk(AskRequestDto ask) {
         this.seq = ask.getSeq();
         this.type = AskTypeEnum.CONFIRM;
         // this.confirmUser = user;

@@ -1,8 +1,12 @@
 package com.example.beepoo.repository;
 
+import static com.example.beepoo.entity.QItem.item;
+import static org.springframework.util.StringUtils.hasText;
+
 import com.example.beepoo.dto.ItemRequestDto;
 import com.example.beepoo.dto.ItemResponseDto;
 import com.example.beepoo.dto.QItemResponseDto;
+import com.example.beepoo.enums.ItemStatusEnum;
 import com.example.beepoo.util.OrderByNull;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -10,19 +14,16 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
-import static com.example.beepoo.entity.QItem.item;
-import static org.springframework.util.StringUtils.hasText;
-
 @Repository
 public class ItemCustomRepositoryImpl implements ItemCustomRepository {
+
     private final JPAQueryFactory jpaQueryFactory;
 
     public ItemCustomRepositoryImpl(JPAQueryFactory jpaQueryFactory) {
@@ -32,35 +33,38 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
-    public List<ItemResponseDto> getItemList(ItemRequestDto condition, Pageable pageable){
+    public List<ItemResponseDto> getItemList(ItemRequestDto condition, Pageable pageable) {
         List<ItemResponseDto> itemList = jpaQueryFactory
-                .select(new QItemResponseDto(
-                        item.seq,
-                        item.name,
-                        item.typeCode,
-                        item.statusCode,
-                        item.serial,
-                        item.comment,
-                        item.createDate,
-                        item.createUser,
-                        item.modifyDate,
-                        item.modifyUser))
-                .from(item)
-                .where(
-                        nameEq(condition.getName()),
-                        typeCodeEq(condition.getTypeCode()),
-                        statusCodeEq(condition.getStatusCode()),
-                        serialEq(condition.getSerial()),
-                        commentEq(condition.getComment()),
-                        createDateRangeEq(condition.getCreateDate()),
-                        createUserEq(condition.getCreateUser()),
-                        modifyDateRangeEq(condition.getModifyDate()),
-                        modifyUserEq(condition.getModifyUser())
+            .select(
+                new QItemResponseDto(
+                    item.seq,
+                    item.name,
+                    item.typeCode,
+                    item.status,
+                    item.serial,
+                    item.comment,
+                    item.createDate,
+                    item.createUser,
+                    item.modifyDate,
+                    item.modifyUser
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(OrderBy(pageable))
-                .fetch();
+            )
+            .from(item)
+            .where(
+                nameEq(condition.getName()),
+                typeCodeEq(condition.getTypeCode()),
+                statusEq(condition.getStatus()),
+                serialEq(condition.getSerial()),
+                commentEq(condition.getComment()),
+                createDateRangeEq(condition.getCreateDate()),
+                createUserEq(condition.getCreateUser()),
+                modifyDateRangeEq(condition.getModifyDate()),
+                modifyUserEq(condition.getModifyUser())
+            )
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .orderBy(OrderBy(pageable))
+            .fetch();
 
         /*// 현재 페이지 개수
         int itemCnt = itemList.size();
@@ -86,33 +90,28 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
 
     @Override
     public void updateItem(ItemRequestDto itemDto) {
-        JPAUpdateClause clause = jpaQueryFactory
-                .update(item)
-                .where(item.seq.eq(itemDto.getSeq()));
-                if (hasText(itemDto.getName())) {
-                    clause.set(item.name, itemDto.getName());
-                }
-                if (itemDto.getTypeCode() != null) {
-                    clause.set(item.typeCode, itemDto.getTypeCode());
-                }
-                if (itemDto.getStatusCode() != null) {
-                    clause.set(item.statusCode, itemDto.getStatusCode());
-                }
-                if (hasText(itemDto.getSerial())) {
-                    clause.set(item.serial, itemDto.getSerial());
-                }
-                if (hasText(itemDto.getComment())) {
-                    clause.set(item.comment, itemDto.getComment());
-                }
+        JPAUpdateClause clause = jpaQueryFactory.update(item).where(item.seq.eq(itemDto.getSeq()));
+        if (hasText(itemDto.getName())) {
+            clause.set(item.name, itemDto.getName());
+        }
+        if (itemDto.getTypeCode() != null) {
+            clause.set(item.typeCode, itemDto.getTypeCode());
+        }
+        if (itemDto.getStatus() != null) {
+            clause.set(item.status, itemDto.getStatus());
+        }
+        if (hasText(itemDto.getSerial())) {
+            clause.set(item.serial, itemDto.getSerial());
+        }
+        if (hasText(itemDto.getComment())) {
+            clause.set(item.comment, itemDto.getComment());
+        }
         clause.execute();
     }
 
     @Override
     public void deleteItem(List<Integer> seqs) {
-        long count = jpaQueryFactory
-                .delete(item)
-                .where(item.seq.in(seqs))
-                .execute();
+        jpaQueryFactory.delete(item).where(item.seq.in(seqs)).execute();
     }
 
     private BooleanExpression nameEq(String name) {
@@ -123,8 +122,8 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
         return typeCode != null ? item.typeCode.in(typeCode) : null;
     }
 
-    private BooleanExpression statusCodeEq(Integer statusCode) {
-        return statusCode != null ? item.statusCode.in(statusCode) : null;
+    private BooleanExpression statusEq(ItemStatusEnum status) {
+        return status != null ? item.status.in(status) : null;
     }
 
     private BooleanExpression serialEq(String serial) {
@@ -136,15 +135,15 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
     }
 
     private BooleanExpression createDateRangeEq(String createDateRange) {
-        String start = createDateRange.split("~")[0] + " 00:00:00";
-        String end = createDateRange.split("~")[1] + " 23:59:59";
+        if (hasText(createDateRange)) {
+            String start = createDateRange.split("~")[0] + " 00:00:00";
+            String end = createDateRange.split("~")[1] + " 23:59:59";
 
-        if(hasText(createDateRange)){
             LocalDateTime startDate = LocalDateTime.parse(start, formatter);
             LocalDateTime endDate = LocalDateTime.parse(end, formatter);
 
             return item.createDate.between(startDate, endDate);
-        }else{
+        } else {
             return null;
         }
     }
@@ -154,15 +153,15 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
     }
 
     private BooleanExpression modifyDateRangeEq(String modifyDateRange) {
-        String start = modifyDateRange.split("~")[0] + " 00:00:00";
-        String end = modifyDateRange.split("~")[1] + " 23:59:59";
+        if (hasText(modifyDateRange)) {
+            String start = modifyDateRange.split("~")[0] + " 00:00:00";
+            String end = modifyDateRange.split("~")[1] + " 23:59:59";
 
-        if(hasText(modifyDateRange)){
             LocalDateTime startDate = LocalDateTime.parse(start, formatter);
             LocalDateTime endDate = LocalDateTime.parse(end, formatter);
 
             return item.modifyDate.between(startDate, endDate);
-        }else{
+        } else {
             return null;
         }
     }
@@ -176,7 +175,7 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
         Sort sort = pageable.getSort();
 
         // 정렬 옵션이 없는 경우
-        if(Sort.unsorted().equals(sort)){
+        if (Sort.unsorted().equals(sort)) {
             return result;
         }
 
@@ -186,7 +185,7 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
 
             result = new OrderSpecifier(o.isAscending() ? Order.ASC : Order.DESC, pathBuilder.get(o.getProperty()));
         }
-        
+
         return result;
     }
 }
