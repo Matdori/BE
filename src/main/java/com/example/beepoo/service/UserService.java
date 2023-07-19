@@ -9,7 +9,12 @@ import com.example.beepoo.exception.CustomException;
 import com.example.beepoo.exception.ErrorCode;
 import com.example.beepoo.repository.DepartmentRepository;
 import com.example.beepoo.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,25 +27,30 @@ public class UserService {
 
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+
 
     @Transactional
     public GlobalResponseDto<UserResponseDto> createUser(UserRequestDto userRequestDto) {
 
-        //ToDo[07] : 권한확인 해야할까?
+        //ToDo[07] : 권한확인
 
-        //ToDo[07] : 유저를 생성하면서 부서를 생성하게 할 것인가??
 
         //이메일 중복 여부 확인
         if (userRepository.existsByUserEmail(userRequestDto.getUserEmail())) {
             throw new CustomException(ErrorCode.USER_ALREADY_EXIST);
         }
 
-        //ToDo[07] : pw 암호화
-        //부서 먼저 찾기
+        //ToDo[07] : 유저를 생성하면서 부서를 생성하게 할 것인가??
+        //부서 존재 여부 확인
         Department department = departmentRepository.findDepartmentByDepartmentName(userRequestDto.getDepartmentName())
                 .orElseThrow(()-> new CustomException(ErrorCode.DEPARTMENT_NOT_FOUND));
 
-        User user = new User(userRequestDto);
+        //ToDo[07] : pw 암호화
+        String encodedPassword = passwordEncoder.encode(userRequestDto.getUserPassword());
+
+        User user = new User(userRequestDto, encodedPassword);
         user.setDepartment(department);
         department.setUserCount(department.getUserCount() + 1);
 

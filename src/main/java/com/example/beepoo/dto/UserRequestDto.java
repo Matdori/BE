@@ -1,6 +1,6 @@
 package com.example.beepoo.dto;
 
-import jakarta.validation.constraints.Email;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -22,7 +22,10 @@ public class UserRequestDto {
 
     private String position;
 
-    private String authority;
+    //ToDo[07] : Enum valid 추가해야겠지?
+    @JsonProperty("isAdmin")
+    private boolean isAdmin;
 
     private String departmentName;
+
 }

@@ -39,6 +39,7 @@ public class AskController {
         return askService.insertAsk(askDto);
     }
 
+
     // 요청 수정
     @PatchMapping("/ask")
     @ResponseStatus(HttpStatus.OK)
@@ -62,7 +63,7 @@ public class AskController {
 
     //요청 현황 건수 (대시보드) 필요 시 목록
     @GetMapping("/ask/count")
-    public GlobalResponseDto<Long> getAskCount(){
+    public GlobalResponseDto<Long> getAskCount() {
         return askService.getAskCount();
     }
 }
