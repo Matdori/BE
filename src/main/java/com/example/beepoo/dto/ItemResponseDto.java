@@ -1,19 +1,20 @@
 package com.example.beepoo.dto;
 
 import com.example.beepoo.entity.Item;
+import com.example.beepoo.enums.ItemStatusEnum;
 import com.querydsl.core.annotations.QueryProjection;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
 public class ItemResponseDto {
+
     private Integer seq;
     private String name;
     private Integer typeCode;
-    private Integer statusCode;
+    private ItemStatusEnum status;
     private String serial;
     private String comment;
     private LocalDateTime createDate;
@@ -21,11 +22,11 @@ public class ItemResponseDto {
     private LocalDateTime modifyDate;
     private String modifyUser;
 
-    public ItemResponseDto(Item entity){
+    public ItemResponseDto(Item entity) {
         this.seq = entity.getSeq();
         this.name = entity.getName();
         this.typeCode = entity.getTypeCode();
-        this.statusCode = entity.getStatusCode();
+        this.status = entity.getStatus();
         this.serial = entity.getSerial();
         this.comment = entity.getComment();
         this.createDate = entity.getCreateDate();
@@ -35,11 +36,22 @@ public class ItemResponseDto {
     }
 
     @QueryProjection
-    public ItemResponseDto(Integer seq, String name, Integer typeCode, Integer statusCode, String serial, String comment, LocalDateTime createDate, String createUser, LocalDateTime modifyDate, String modifyUser) {
+    public ItemResponseDto(
+        Integer seq,
+        String name,
+        Integer typeCode,
+        ItemStatusEnum status,
+        String serial,
+        String comment,
+        LocalDateTime createDate,
+        String createUser,
+        LocalDateTime modifyDate,
+        String modifyUser
+    ) {
         this.seq = seq;
         this.name = name;
         this.typeCode = typeCode;
-        this.statusCode = statusCode;
+        this.status = status;
         this.serial = serial;
         this.comment = comment;
         this.createDate = createDate;
