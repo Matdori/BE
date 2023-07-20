@@ -1,9 +1,12 @@
 package com.example.beepoo.controller;
 
 import com.example.beepoo.dto.GlobalResponseDto;
+import com.example.beepoo.dto.LoginRequestDto;
 import com.example.beepoo.dto.UserRequestDto;
 import com.example.beepoo.dto.UserResponseDto;
 import com.example.beepoo.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +20,16 @@ public class UserController {
 
     private final UserService userService;
 
-    //사원 등록
+    //로그인
+    @GetMapping("/login")
+    public GlobalResponseDto<UserResponseDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse res) {
+        return userService.login(loginRequestDto, res);
+    }
+
+    //사원등록
     @PostMapping
-    public GlobalResponseDto<UserResponseDto> createUser(@RequestBody @Valid UserRequestDto userRequestDto) {
-        return userService.createUser(userRequestDto);
+    public GlobalResponseDto<UserResponseDto> createUser(@RequestBody @Valid UserRequestDto userRequestDto, HttpServletRequest req) {
+        return userService.createUser(userRequestDto, req);
     }
 
     //사원 수정

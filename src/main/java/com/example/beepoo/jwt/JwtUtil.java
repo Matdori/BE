@@ -34,11 +34,9 @@ public class JwtUtil {
 
     // Base64 Encode 한 SecretKey
     @Value("${jwt.secret.key}")
-
-    //JWT 생성 시 가져온 key
     private String secretKey;
 
-    //Decode 된 SecretKey를 담는 객체
+    //Decode 된 SecretKey 를 담는 객체
     private Key key;
 
     //사용알고리즘
@@ -55,12 +53,12 @@ public class JwtUtil {
     }
 
     //토큰 생성
-    public String createToken(String userEmail, UserRoleEnum role) {
+    public String createToken(Long userId, UserRoleEnum role) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
-                        .setSubject(userEmail) // 사용자 식별 값(ID)
+                        .setSubject(userId.toString()) // 사용자 식별 값(ID)
                         .claim(AUTHORIZATION_KEY, role) //사용자 권한 (key value 형식)
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME)) //만료 시간
                         .setIssuedAt(date) //발급일

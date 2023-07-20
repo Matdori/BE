@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 @Getter
 public enum ErrorCode {
+    //ToDo[07] : 코드 중복제거, 카테고리별 정렬
     // 409 CONFLICT : 자원 충돌, 중복 데이터
     DEPARTMENT_ALREADY_EXIST(HttpStatus.CONFLICT.value(), "D001", "이미 등록된 부서 입니다."),
     USER_ALREADY_EXIST(HttpStatus.CONFLICT.value(), "U001", "이미 등록된 사용자 입니다."),
@@ -18,7 +19,9 @@ public enum ErrorCode {
     ITEM_ALREADY_ASSIGNED(HttpStatus.CONFLICT.value(), "I002", "이미 할당된 비품입니다."),
     ITEM_ALREADY_DISCARD(HttpStatus.CONFLICT.value(), "I002", "이미 폐기된 비품입니다."),
     ASK_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "A001", "존재하지 않는 요청입니다."),
-    ASK_ALREADY_CONFIRM(HttpStatus.INTERNAL_SERVER_ERROR.value(), "A002", "이미 처리된 요청입니다.");
+    ASK_ALREADY_CONFIRM(HttpStatus.INTERNAL_SERVER_ERROR.value(), "A002", "이미 처리된 요청입니다."),
+
+    PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST.value(), "U002", "비밀번호가 일치하지 않습니다.");
 
     private final int httpStatus;
     private final String errorCode;
