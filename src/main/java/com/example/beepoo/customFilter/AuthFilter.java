@@ -50,7 +50,6 @@ public class AuthFilter implements Filter {
                 User user = userRepository.findById(Long.valueOf(info.getSubject())).orElseThrow(() ->
                         new NullPointerException("Not Found User")
                 );
-                System.out.println(user.getUserEmail());
                 request.setAttribute("user", user);
                 chain.doFilter(request, response); // 다음 Filter 로 이동
             } else {
