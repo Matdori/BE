@@ -1,14 +1,18 @@
 package com.example.beepoo.service;
 
 import com.example.beepoo.dto.GlobalResponseDto;
+import com.example.beepoo.dto.LoginRequestDto;
 import com.example.beepoo.dto.UserRequestDto;
 import com.example.beepoo.dto.UserResponseDto;
 import com.example.beepoo.entity.Department;
 import com.example.beepoo.entity.User;
 import com.example.beepoo.exception.CustomException;
 import com.example.beepoo.exception.ErrorCode;
+import com.example.beepoo.jwt.JwtUtil;
 import com.example.beepoo.repository.DepartmentRepository;
 import com.example.beepoo.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,12 +31,30 @@ public class UserService {
 
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
+    //로그인
+    public GlobalResponseDto<UserResponseDto> login(LoginRequestDto loginRequestDto, HttpServletResponse res) {
+        //존재 여부 확인
+        User user = userRepository.findUserByUserEmail(loginRequestDto.getUserEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        //비밀번호 확인
+        if (!passwordEncoder.matches(loginRequestDto.getUserPassword(), user.getUserPassword())){
+            throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+
+        String token = jwtUtil.createToken(user.getId(), user.getUserRole());
+        jwtUtil.addJwtToCookie(token, res);
+
+        return GlobalResponseDto.ok("로그인 성공", new UserResponseDto(user));
+    }
+
+    //유저등록
     @Transactional
-    public GlobalResponseDto<UserResponseDto> createUser(UserRequestDto userRequestDto) {
+    public GlobalResponseDto<UserResponseDto> createUser(UserRequestDto userRequestDto, HttpServletRequest req) {
 
         //ToDo[07] : 권한확인
 
@@ -55,12 +77,15 @@ public class UserService {
         department.setUserCount(department.getUserCount() + 1);
 
         //ToDo[07] : user 생성자 확인하여 추가해줘야함 (user.setCreateUser();)
+        User currentUser = (User)req.getAttribute("user");
+        user.setCreateUser(currentUser.getId().toString());
         userRepository.save(user);
 
         return GlobalResponseDto.ok("생성 완료", new UserResponseDto(user));
 
     }
 
+    //유저 수정
     @Transactional
     public GlobalResponseDto<UserResponseDto> updateUser(UserRequestDto userRequestDto) {
         User user = userRepository.findUserByUserEmail(userRequestDto.getUserEmail())
@@ -69,6 +94,7 @@ public class UserService {
         return GlobalResponseDto.ok("수정 완료", new UserResponseDto(user));
     }
 
+    //유저 삭제
     @Transactional
     public GlobalResponseDto deleteUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -76,6 +102,7 @@ public class UserService {
         return GlobalResponseDto.ok("삭제 완료");
     }
 
+    //유저 조회
     @Transactional
     public GlobalResponseDto<UserResponseDto> getUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -83,6 +110,7 @@ public class UserService {
         return GlobalResponseDto.ok("조회 성공", new UserResponseDto(user));
     }
 
+    //유저목록 조회(부서)
     @Transactional
     public GlobalResponseDto<List<UserResponseDto>> getUserListByDepartment(String departmentName) {
         List<User> userList = userRepository.findUsersByDepartmentName(departmentName);
@@ -101,4 +129,5 @@ public class UserService {
             return GlobalResponseDto.ok("사용 가능한 이메일", true);
         }
     }
+
 }

@@ -28,7 +28,8 @@ public class AuthFilter implements Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String url = httpServletRequest.getRequestURI();
         if (StringUtils.hasText(url) &&
-                (url.startsWith("/api/user") || url.startsWith("/css") || url.startsWith("/js"))
+                //ToDo[07] : 인증 필요없는 url 수정필요
+                (url.startsWith("/api/user123") || url.startsWith("/css") || url.startsWith("/js"))
         ) {
             // 회원가입, 로그인 관련 API 는 인증 필요없이 요청 진행
             chain.doFilter(request, response); // 다음 Filter 로 이동
@@ -46,9 +47,10 @@ public class AuthFilter implements Filter {
                 // 토큰에서 사용자 정보 가져오기
                 Claims info = jwtUtil.getUserInfoFromToken(token);
                 //Todo : 수정
-                User user = userRepository.findById(1l).orElseThrow(() ->
+                User user = userRepository.findById(Long.valueOf(info.getSubject())).orElseThrow(() ->
                         new NullPointerException("Not Found User")
                 );
+                System.out.println(user.getUserEmail());
                 request.setAttribute("user", user);
                 chain.doFilter(request, response); // 다음 Filter 로 이동
             } else {
