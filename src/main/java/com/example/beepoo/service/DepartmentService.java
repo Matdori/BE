@@ -4,9 +4,12 @@ import com.example.beepoo.dto.DepartmentRequestDto;
 import com.example.beepoo.dto.DepartmentResponseDto;
 import com.example.beepoo.dto.GlobalResponseDto;
 import com.example.beepoo.entity.Department;
+import com.example.beepoo.entity.User;
 import com.example.beepoo.exception.CustomException;
 import com.example.beepoo.exception.ErrorCode;
 import com.example.beepoo.repository.DepartmentRepository;
+import com.example.beepoo.util.CustomUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,44 +23,69 @@ public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
 
+    //부서 등록
     @Transactional
-    public int createDepartment (DepartmentRequestDto departmentRequestDto) {
+    public GlobalResponseDto<DepartmentResponseDto> createDepartment(DepartmentRequestDto departmentRequestDto,
+                                                                     HttpServletRequest req) {
+        User currentUser = CustomUtil.getUserFromReq(req);
+        CustomUtil.checkAuthorization(currentUser);
 
         if (departmentRepository.existsByDepartmentName(departmentRequestDto.getDepartmentName())) {
             throw new CustomException(ErrorCode.DEPARTMENT_ALREADY_EXIST);
         }
         Department department = new Department(departmentRequestDto);
 
-        //ToDo[07] : 유저 등록 해야함
-//        department.setCreateUser("유저 이름 넣기");
+        department.setCreateUser(currentUser.getId().toString());
+
         departmentRepository.save(department);
-        return 1;
+        return GlobalResponseDto.ok("부서 등록 성공", new DepartmentResponseDto(department));
     }
 
+    //부서 수정
     @Transactional
-    public GlobalResponseDto<DepartmentResponseDto> updateDepartment(Long departmentId, DepartmentRequestDto departmentRequestDto) {
+    public GlobalResponseDto<DepartmentResponseDto> updateDepartment(Long departmentId,
+                                                                     DepartmentRequestDto departmentRequestDto,
+                                                                     HttpServletRequest req) {
+        User currentUser = CustomUtil.getUserFromReq(req);
+        CustomUtil.checkAuthorization(currentUser);
 
-        Department department = departmentRepository.findById(departmentId).orElseThrow(()-> new IllegalArgumentException());
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(()-> new CustomException(ErrorCode.DEPARTMENT_NOT_FOUND));
         department.update(departmentRequestDto);
 
-        return GlobalResponseDto.ok("업데이트했슈", new DepartmentResponseDto(department));
+        return GlobalResponseDto.ok("업데이트 성공", new DepartmentResponseDto(department));
     }
 
     @Transactional
-    public GlobalResponseDto deleteDepartment(Long departmentId) {
+    public GlobalResponseDto deleteDepartment(Long departmentId, HttpServletRequest req) {
         //ToDo[07] : 존재하는 아이디인지 먼저 확인 해야할까
+        User currentUser = CustomUtil.getUserFromReq(req);
+        CustomUtil.checkAuthorization(currentUser);
+
+        if (!departmentRepository.existsById(departmentId)){
+            throw new CustomException(ErrorCode.DEPARTMENT_NOT_FOUND);
+        }
+
         departmentRepository.deleteById(departmentId);
-        return GlobalResponseDto.ok("삭제했슈");
+        return GlobalResponseDto.ok("삭제 성공");
     }
 
     @Transactional
-    public GlobalResponseDto<DepartmentResponseDto> getDepartment(Long departmentId) {
-        Department department = departmentRepository.findById(departmentId).orElseThrow(()-> new IllegalArgumentException());
+    public GlobalResponseDto<DepartmentResponseDto> getDepartment(Long departmentId, HttpServletRequest req) {
+        User currentUser = CustomUtil.getUserFromReq(req);
+        CustomUtil.checkAuthorization(currentUser);
+
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(()-> new CustomException(ErrorCode.DEPARTMENT_NOT_FOUND));
+
         return GlobalResponseDto.ok("단건조회", new DepartmentResponseDto(department));
     }
     
     @Transactional
-    public GlobalResponseDto<List<DepartmentResponseDto>> getDepartmentList() {
+    public GlobalResponseDto<List<DepartmentResponseDto>> getDepartmentList(HttpServletRequest req) {
+        User currentUser = CustomUtil.getUserFromReq(req);
+        CustomUtil.checkAuthorization(currentUser);
+
         List<Department> departmentList = departmentRepository.findAll();
         List<DepartmentResponseDto> departmentResponseDtoList = new ArrayList<>();
         for (Department department : departmentList) {
