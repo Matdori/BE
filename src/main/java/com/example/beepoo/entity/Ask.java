@@ -42,10 +42,10 @@ public class Ask extends TimeStamp {
     @Column(nullable = true)
     private String confirmMsg;
 
-    public Ask(AskRequestDto ask, Item item, User user) {
+    public Ask(AskRequestDto ask, Item item) {
         this.item = item;
         this.type = ask.getAskType();
-        this.askUser = user;
+        this.askUser = ask.getAskUser();
         this.askMsg = ask.getAskMsg();
         this.askImg = ask.getAskImg();
     }
@@ -64,7 +64,7 @@ public class Ask extends TimeStamp {
     public void confirmAsk(AskRequestDto ask) {
         this.seq = ask.getSeq();
         this.type = AskTypeEnum.CONFIRM;
-        // this.confirmUser = user;
+        this.confirmUser = ask.getConfirmUser();
         this.confirmMsg = ask.getConfirmMsg();
     }
 }
