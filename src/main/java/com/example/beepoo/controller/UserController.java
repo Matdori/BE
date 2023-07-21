@@ -1,9 +1,6 @@
 package com.example.beepoo.controller;
 
-import com.example.beepoo.dto.GlobalResponseDto;
-import com.example.beepoo.dto.LoginRequestDto;
-import com.example.beepoo.dto.UserRequestDto;
-import com.example.beepoo.dto.UserResponseDto;
+import com.example.beepoo.dto.*;
 import com.example.beepoo.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,14 +31,14 @@ public class UserController {
 
     //사원 수정
     @PutMapping
-    public GlobalResponseDto<UserResponseDto> updateUser(@RequestBody UserRequestDto userRequestDto) {
-        return userService.updateUser(userRequestDto);
+    public GlobalResponseDto<UserResponseDto> updateUser(@RequestBody UserRequestDto userRequestDto, HttpServletRequest req) {
+        return userService.updateUser(userRequestDto, req);
     }
 
     //사원 삭제
     @DeleteMapping("/{userId}")
-    public GlobalResponseDto deleteUser(@PathVariable Long userId) {
-        return userService.deleteUser(userId);
+    public GlobalResponseDto deleteUser(@PathVariable Long userId, HttpServletRequest req) {
+        return userService.deleteUser(userId, req);
     }
 
     //사원 조회
@@ -52,14 +49,24 @@ public class UserController {
 
     //부서 내 사원 조회
     @GetMapping("/department")
-    public GlobalResponseDto<List<UserResponseDto>> getUserListByDepartment(@RequestParam("name") String departmentName) {
-        return userService.getUserListByDepartment(departmentName);
+    public GlobalResponseDto<List<UserResponseDto>> getUserListByDepartment(@RequestParam("name") String departmentName, HttpServletRequest req) {
+        return userService.getUserListByDepartment(departmentName, req);
     }
 
 
     //비밀번호 변경
-    //Todo[07] : jwt 이후 비밀번호 변경 구현
+    @PatchMapping("/password")
+    public GlobalResponseDto updatePassword(@RequestBody PasswordRequestDto passwordRequestDto,
+                                            HttpServletRequest req){
+        return userService.updatePassword(passwordRequestDto, req);
+    }
 
+    //내 정보 조회
+    //ToDo[07] : 인증 방식에 따라 달라질 예정
+    @GetMapping("/info")
+    public GlobalResponseDto<UserResponseDto> getMyInfo(HttpServletRequest req){
+        return userService.getMyInfo(req);
+    }
 
     // 이메일 중복 체크
     @GetMapping("/checkEmail/{email}")
@@ -67,6 +74,5 @@ public class UserController {
         return userService.checkUserEmail(email);
     }
 
-    //내 정보 조회
-    //ToDo[07] : 인증 방식에 따라 달라질 예정
+
 }
