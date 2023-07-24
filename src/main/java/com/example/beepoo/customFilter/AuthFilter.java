@@ -29,7 +29,7 @@ public class AuthFilter implements Filter {
         String url = httpServletRequest.getRequestURI();
         if (StringUtils.hasText(url) &&
                 //ToDo[07] : 인증 필요없는 url 수정필요
-                (url.startsWith("/api/user123") || url.startsWith("/css") || url.startsWith("/js"))
+                (url.startsWith("/api/user123") || url.startsWith("/css") || url.startsWith("/js") || url.startsWith(""))
         ) {
             // 회원가입, 로그인 관련 API 는 인증 필요없이 요청 진행
             chain.doFilter(request, response); // 다음 Filter 로 이동
