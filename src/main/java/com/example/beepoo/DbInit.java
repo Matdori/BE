@@ -5,7 +5,6 @@ import com.example.beepoo.enums.UserRoleEnum;
 import com.example.beepoo.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -14,9 +13,7 @@ import org.springframework.stereotype.Component;
 public class DbInit {
 
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @PostConstruct
     private void init() {

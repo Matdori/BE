@@ -8,17 +8,16 @@ import com.example.beepoo.exception.ErrorCode;
 import com.example.beepoo.jwt.JwtUtil;
 import com.example.beepoo.repository.DepartmentRepository;
 import com.example.beepoo.repository.UserRepository;
-import com.example.beepoo.util.CustomUtil;
+import com.example.beepoo.util.CurrentUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +33,9 @@ public class UserService {
     @Transactional
     public GlobalResponseDto<UserResponseDto> login(LoginRequestDto loginRequestDto, HttpServletResponse res) {
         //존재 여부 확인
-        User user = userRepository.findUserByUserEmail(loginRequestDto.getUserEmail())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository
+            .findUserByUserEmail(loginRequestDto.getUserEmail())
+            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         //비밀번호 확인
         if (!passwordEncoder.matches(loginRequestDto.getUserPassword(), user.getUserPassword())) {
@@ -51,9 +51,8 @@ public class UserService {
     //유저등록
     @Transactional
     public GlobalResponseDto<UserResponseDto> createUser(UserRequestDto userRequestDto, HttpServletRequest req) {
-
-        User currentUser = CustomUtil.getUserFromReq(req);
-        CustomUtil.checkAuthorization(currentUser);
+        User currentUser = CurrentUser.getUser(req);
+        CurrentUser.checkAuthorization(currentUser);
 
         //이메일 중복 여부 확인
         if (userRepository.existsByUserEmail(userRequestDto.getUserEmail())) {
@@ -62,8 +61,9 @@ public class UserService {
 
         //ToDo[07] : 유저를 생성하면서 부서를 생성하게 할 것인가??
         //부서 존재 여부 확인
-        Department department = departmentRepository.findDepartmentByDepartmentName(userRequestDto.getDepartmentName())
-                .orElseThrow(() -> new CustomException(ErrorCode.DEPARTMENT_NOT_FOUND));
+        Department department = departmentRepository
+            .findDepartmentByDepartmentName(userRequestDto.getDepartmentName())
+            .orElseThrow(() -> new CustomException(ErrorCode.DEPARTMENT_NOT_FOUND));
 
         String encodedPassword = passwordEncoder.encode(userRequestDto.getUserPassword());
 
@@ -75,16 +75,16 @@ public class UserService {
         userRepository.save(user);
 
         return GlobalResponseDto.ok("생성 완료", new UserResponseDto(user));
-
     }
 
     //유저 수정
     @Transactional
     public GlobalResponseDto<UserResponseDto> updateUser(UserRequestDto userRequestDto, HttpServletRequest req) {
         //ToDo[07] : email도 수정할 수 있도록 할 것인가?, 본인 외 수정 권한 없는 상태
-        User currentUser = CustomUtil.getUserFromReq(req);
-        User user = userRepository.findUserByUserEmail(userRequestDto.getUserEmail())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User currentUser = CurrentUser.getUser(req);
+        User user = userRepository
+            .findUserByUserEmail(userRequestDto.getUserEmail())
+            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         //본인이 아니면 수정할 수 없도록
         if (!Objects.equals(currentUser.getId(), user.getId())) {
@@ -99,8 +99,8 @@ public class UserService {
     @Transactional
     public GlobalResponseDto deleteUser(Long userId, HttpServletRequest req) {
         //권한 확인
-        User currentUser = CustomUtil.getUserFromReq(req);
-        CustomUtil.checkAuthorization(currentUser);
+        User currentUser = CurrentUser.getUser(req);
+        CurrentUser.checkAuthorization(currentUser);
 
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         userRepository.deleteById(userId);
@@ -117,10 +117,13 @@ public class UserService {
 
     //유저목록 조회(부서)
     @Transactional
-    public GlobalResponseDto<List<UserResponseDto>> getUserListByDepartment(String departmentName, HttpServletRequest req) {
+    public GlobalResponseDto<List<UserResponseDto>> getUserListByDepartment(
+        String departmentName,
+        HttpServletRequest req
+    ) {
         //권한 확인
-        User currentUser = CustomUtil.getUserFromReq(req);
-        CustomUtil.checkAuthorization(currentUser);
+        User currentUser = CurrentUser.getUser(req);
+        CurrentUser.checkAuthorization(currentUser);
 
         List<User> userList = userRepository.findUsersByDepartmentName(departmentName);
         List<UserResponseDto> dtoList = new ArrayList();
@@ -142,9 +145,10 @@ public class UserService {
     //비밀번호 변경
     @Transactional
     public GlobalResponseDto updatePassword(PasswordRequestDto passwordRequestDto, HttpServletRequest req) {
-        User currentUser = CustomUtil.getUserFromReq(req);
-        User user = userRepository.findById(passwordRequestDto.getUserId())
-                .orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User currentUser = CurrentUser.getUser(req);
+        User user = userRepository
+            .findById(passwordRequestDto.getUserId())
+            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         //ToDo[07] : 확인 해야하나?
         if (!Objects.equals(user.getId(), currentUser.getId())) {
@@ -152,7 +156,7 @@ public class UserService {
         }
 
         //비밀번호 일치 확인
-        if (!passwordEncoder.matches(passwordRequestDto.getOldPassword(), user.getUserPassword())){
+        if (!passwordEncoder.matches(passwordRequestDto.getOldPassword(), user.getUserPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
         }
 
@@ -164,9 +168,10 @@ public class UserService {
     //내 정보 조회
     public GlobalResponseDto<UserResponseDto> getMyInfo(HttpServletRequest req) {
         //Todo[07] : 굳이 두번 찾아야하나??
-        User currentUser = CustomUtil.getUserFromReq(req);
-        User user = userRepository.findById(currentUser.getId())
-                .orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User currentUser = CurrentUser.getUser(req);
+        User user = userRepository
+            .findById(currentUser.getId())
+            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         return GlobalResponseDto.ok("조회 성공", new UserResponseDto(user));
     }
 }

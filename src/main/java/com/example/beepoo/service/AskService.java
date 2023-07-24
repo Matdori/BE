@@ -28,7 +28,6 @@ public class AskService {
     private final AskRepository askRepository;
     private final AskCustomRepository askCustomRepository;
     private final ItemRepository itemRepository;
-    private final CurrentUser currentUser;
 
     @Transactional
     public GlobalResponseDto<List<AskResponseDto>> getAskList(
@@ -37,8 +36,8 @@ public class AskService {
         Pageable pageable
     ) {
         // 사용자인 경우 해당 사용자의 요청만 조회
-        if (!UserRoleEnum.ADMIN.equals(currentUser.getUserRole(req))) {
-            condition.setAskUserName(currentUser.getUserName(req));
+        if (!UserRoleEnum.ADMIN.equals(CurrentUser.getUserRole(req))) {
+            condition.setAskUserName(CurrentUser.getUserName(req));
         }
 
         // 요청 목록 조회
@@ -52,8 +51,8 @@ public class AskService {
         // 요청 존재 여부 확인
         Ask askEntity = askRepository.findById(seq).orElseThrow(() -> new CustomException(ErrorCode.ASK_NOT_FOUND));
         // 사용자인 경우, 해당 사용자의 요청인지 확인
-        if (!UserRoleEnum.ADMIN.equals(currentUser.getUserRole(req))) {
-            if (askEntity.getAskUser().getId() != currentUser.getUserId(req)) {
+        if (!UserRoleEnum.ADMIN.equals(CurrentUser.getUserRole(req))) {
+            if (askEntity.getAskUser().getId() != CurrentUser.getUserId(req)) {
                 throw new CustomException(ErrorCode.ONLY_ASK_USER_VIEW);
             }
         }
@@ -81,7 +80,7 @@ public class AskService {
         Ask ask = new Ask(askDto, item);
         ask.setItem(item);
         ask.setType(AskTypeEnum.ASK);
-        ask.setAskUser(currentUser.getUser(req));
+        ask.setAskUser(CurrentUser.getUser(req));
         askRepository.save(ask);
         // 비품 상태 변경
         itemRepository.updateStatusBySeq(item.getSeq(), ItemStatusEnum.ASSIGNED);
@@ -100,7 +99,7 @@ public class AskService {
             throw new CustomException(ErrorCode.ASK_ALREADY_CONFIRM);
         }
         // 요청자 일치 여부 확인
-        if (ask.getAskUser().getId() != currentUser.getUserId(req)) {
+        if (ask.getAskUser().getId() != CurrentUser.getUserId(req)) {
             throw new CustomException(ErrorCode.ONLY_ASK_USER_MODIFY);
         }
 
@@ -121,7 +120,7 @@ public class AskService {
             throw new CustomException(ErrorCode.ASK_ALREADY_CONFIRM);
         }
         // 요청자 일치 여부 확인
-        if (ask.getAskUser().getId() != currentUser.getUserId(req)) {
+        if (ask.getAskUser().getId() != CurrentUser.getUserId(req)) {
             throw new CustomException(ErrorCode.ONLY_ASK_USER_CANCEL);
         }
 
@@ -142,7 +141,7 @@ public class AskService {
             throw new CustomException(ErrorCode.ASK_ALREADY_CONFIRM);
         }
         // 처리자 세팅
-        ask.setConfirmUser(currentUser.getUser(req));
+        ask.setConfirmUser(CurrentUser.getUser(req));
 
         // 요청 처리
         ask.confirmAsk(askDto);
