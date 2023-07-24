@@ -167,11 +167,7 @@ public class UserService {
 
     //내 정보 조회
     public GlobalResponseDto<UserResponseDto> getMyInfo(HttpServletRequest req) {
-        //Todo[07] : 굳이 두번 찾아야하나??
         User currentUser = CurrentUser.getUser(req);
-        User user = userRepository
-            .findById(currentUser.getId())
-            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        return GlobalResponseDto.ok("조회 성공", new UserResponseDto(user));
+        return GlobalResponseDto.ok("조회 성공", new UserResponseDto(currentUser));
     }
 }

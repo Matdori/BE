@@ -4,6 +4,7 @@ import com.example.beepoo.dto.GlobalResponseDto;
 import com.example.beepoo.dto.ItemRequestDto;
 import com.example.beepoo.dto.ItemResponseDto;
 import com.example.beepoo.service.ItemService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/item")
+@Tag(name="비품")
 public class ItemController {
 
     private final ItemService itemService;

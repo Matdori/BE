@@ -4,6 +4,7 @@ import com.example.beepoo.dto.DepartmentRequestDto;
 import com.example.beepoo.dto.DepartmentResponseDto;
 import com.example.beepoo.dto.GlobalResponseDto;
 import com.example.beepoo.service.DepartmentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/department")
 @RequiredArgsConstructor
+@Tag(name="부서")
 public class DepartmentController {
     private final DepartmentService departmentService;
 
