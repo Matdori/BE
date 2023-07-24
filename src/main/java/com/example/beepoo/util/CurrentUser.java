@@ -2,6 +2,8 @@ package com.example.beepoo.util;
 
 import com.example.beepoo.entity.User;
 import com.example.beepoo.enums.UserRoleEnum;
+import com.example.beepoo.exception.CustomException;
+import com.example.beepoo.exception.ErrorCode;
 import com.example.beepoo.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,27 +15,37 @@ public class CurrentUser {
     @Autowired
     UserRepository userRepository;
 
-    public User getUser(HttpServletRequest req) {
+    public static User getUser(HttpServletRequest req) {
         User user = (User) req.getAttribute("user");
 
         return user;
     }
 
-    public Long getUserId(HttpServletRequest req) {
+    public static Long getUserId(HttpServletRequest req) {
         User user = (User) req.getAttribute("user");
 
         return user.getId();
     }
 
-    public String getUserName(HttpServletRequest req) {
+    public static String getUserName(HttpServletRequest req) {
         User user = (User) req.getAttribute("user");
 
         return user.getUserName();
     }
 
-    public UserRoleEnum getUserRole(HttpServletRequest req) {
+    public static UserRoleEnum getUserRole(HttpServletRequest req) {
         User user = (User) req.getAttribute("user");
 
         return user.getUserRole();
+    }
+
+    public static boolean isAdmin(User user) {
+        return user.getUserRole().equals(UserRoleEnum.ADMIN);
+    }
+
+    public static void checkAuthorization(User user) {
+        if (!isAdmin(user)) {
+            throw new CustomException(ErrorCode.USER_UNAUTHORIZED);
+        }
     }
 }
