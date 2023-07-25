@@ -1,18 +1,17 @@
 package com.example.beepoo.customFilter;
 
-import com.example.beepoo.jwt.JwtUtil;
 import com.example.beepoo.entity.User;
+import com.example.beepoo.jwt.JwtUtil;
 import com.example.beepoo.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
-import java.io.IOException;
 
 @Slf4j(topic = "AuthFilter")
 @Component
@@ -24,12 +23,20 @@ public class AuthFilter implements Filter {
     private final JwtUtil jwtUtil;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String url = httpServletRequest.getRequestURI();
-        if (StringUtils.hasText(url) &&
-                //ToDo[07] : 인증 필요없는 url 수정필요
-                (url.startsWith("/api/user123") || url.startsWith("/css") || url.startsWith("/js") || url.startsWith(""))
+        if (
+            StringUtils.hasText(url) &&
+            //ToDo[07] : 인증 필요없는 url 수정필요
+            (
+                url.startsWith("/api/user123") ||
+                url.startsWith("/css") ||
+                url.startsWith("/js") ||
+                url.startsWith("/swagger-ui") ||
+                url.startsWith("")
+            )
         ) {
             // 회원가입, 로그인 관련 API 는 인증 필요없이 요청 진행
             chain.doFilter(request, response); // 다음 Filter 로 이동
@@ -46,9 +53,9 @@ public class AuthFilter implements Filter {
                 }
                 // 토큰에서 사용자 정보 가져오기
                 Claims info = jwtUtil.getUserInfoFromToken(token);
-                User user = userRepository.findById(Long.valueOf(info.getSubject())).orElseThrow(() ->
-                        new NullPointerException("Not Found User")
-                );
+                User user = userRepository
+                    .findById(Long.valueOf(info.getSubject()))
+                    .orElseThrow(() -> new NullPointerException("Not Found User"));
                 request.setAttribute("user", user);
                 chain.doFilter(request, response); // 다음 Filter 로 이동
             } else {
