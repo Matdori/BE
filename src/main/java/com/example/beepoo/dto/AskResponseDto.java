@@ -5,14 +5,14 @@ import com.example.beepoo.entity.Item;
 import com.example.beepoo.entity.User;
 import com.example.beepoo.enums.AskTypeEnum;
 import com.querydsl.core.annotations.QueryProjection;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
 public class AskResponseDto {
+
     private Integer seq;
     private Item item;
     private AskTypeEnum type;
@@ -26,7 +26,14 @@ public class AskResponseDto {
     private LocalDateTime modifyDate;
     private String modifyUser;
 
-    public AskResponseDto(Ask entity){
+    // 요청 목록 조회
+    private String itemName;
+    private Integer itemTypeCode;
+    private AskTypeEnum askType;
+    private String askUserName;
+    private String confirmUserName;
+
+    public AskResponseDto(Ask entity) {
         this.seq = entity.getSeq();
         this.item = entity.getItem();
         this.type = entity.getType();
@@ -42,18 +49,19 @@ public class AskResponseDto {
     }
 
     @QueryProjection
-    public AskResponseDto(Integer seq, Item item, AskTypeEnum type, User askUser, String askMsg, String askImg, User confirmUser, String confirmMsg, LocalDateTime createDate, String createUser, LocalDateTime modifyDate, String modifyUser) {
+    public AskResponseDto(
+        Integer seq,
+        String itemName,
+        Integer itemTypeCode,
+        AskTypeEnum askType,
+        String askUserName,
+        String confirmUserName
+    ) {
         this.seq = seq;
-        this.item = item;
-        this.type = type;
-        this.askUser = askUser;
-        this.askMsg = askMsg;
-        this.askImg = askImg;
-        this.confirmUser = confirmUser;
-        this.confirmMsg = confirmMsg;
-        this.createDate = createDate;
-        this.createUser = createUser;
-        this.modifyDate = modifyDate;
-        this.modifyUser = modifyUser;
+        this.itemName = itemName;
+        this.itemTypeCode = itemTypeCode;
+        this.askType = askType;
+        this.askUserName = askUserName;
+        this.confirmUserName = confirmUserName;
     }
 }

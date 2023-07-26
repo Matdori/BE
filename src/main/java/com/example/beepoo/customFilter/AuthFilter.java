@@ -31,11 +31,10 @@ public class AuthFilter implements Filter {
             StringUtils.hasText(url) &&
             //ToDo[07] : 인증 필요없는 url 수정필요
             (
-                url.startsWith("/api/user123") ||
+                url.startsWith("/api/user/login") ||
                 url.startsWith("/css") ||
                 url.startsWith("/js") ||
-                url.startsWith("/swagger-ui") ||
-                url.startsWith("")
+                url.startsWith("/swagger-ui")
             )
         ) {
             // 회원가입, 로그인 관련 API 는 인증 필요없이 요청 진행
