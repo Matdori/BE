@@ -23,7 +23,7 @@ public class UserController {
 
     //로그인
     @Operation(summary = "로그인", description = "로그인 api")
-    @GetMapping("/login")
+    @PostMapping("/login")
     public GlobalResponseDto<UserResponseDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse res) {
         return userService.login(loginRequestDto, res);
     }
