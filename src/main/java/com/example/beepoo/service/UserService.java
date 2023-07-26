@@ -45,6 +45,9 @@ public class UserService {
         String token = jwtUtil.createToken(user.getId(), user.getUserRole());
         jwtUtil.addJwtToCookie(token, res);
 
+        //다른방식
+        jwtUtil.issueToken(res, token);
+
         return GlobalResponseDto.ok("로그인 성공", new UserResponseDto(user));
     }
 
