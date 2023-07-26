@@ -6,18 +6,19 @@ import com.example.beepoo.exception.CustomException;
 import com.example.beepoo.exception.ErrorCode;
 import com.example.beepoo.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CurrentUser {
 
-    @Autowired
-    UserRepository userRepository;
+
+    private final UserRepository userRepository;
 
     public static User getUser(HttpServletRequest req) {
         User user = (User) req.getAttribute("user");
-
         return user;
     }
 

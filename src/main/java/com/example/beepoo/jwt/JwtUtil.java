@@ -130,4 +130,16 @@ public class JwtUtil {
         }
         return null;
     }
+
+    /* header 에서 토큰 가져오기*/
+    public String getTokenFromHeader(HttpServletRequest request) {
+        return request.getHeader(AUTHORIZATION_HEADER);
+    }
+
+
+    /* 토큰 담기 */
+    public void issueToken(HttpServletResponse res, String token) {
+        res.addHeader(AUTHORIZATION_HEADER, token);
+    }
+
 }
