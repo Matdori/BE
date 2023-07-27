@@ -2,6 +2,7 @@ package com.example.beepoo.dto;
 
 import com.example.beepoo.entity.Item;
 import com.example.beepoo.enums.ItemStatusEnum;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ItemResponseDto {
 
     private Integer seq;
@@ -21,6 +23,9 @@ public class ItemResponseDto {
     private String createUser;
     private LocalDateTime modifyDate;
     private String modifyUser;
+    // 비품 목록 조회
+    private String userName;
+    private String departmentName;
 
     public ItemResponseDto(Item entity) {
         this.seq = entity.getSeq();
@@ -44,9 +49,8 @@ public class ItemResponseDto {
         String serial,
         String comment,
         LocalDateTime createDate,
-        String createUser,
-        LocalDateTime modifyDate,
-        String modifyUser
+        String userName,
+        String departmentName
     ) {
         this.seq = seq;
         this.name = name;
@@ -55,8 +59,7 @@ public class ItemResponseDto {
         this.serial = serial;
         this.comment = comment;
         this.createDate = createDate;
-        this.createUser = createUser;
-        this.modifyDate = modifyDate;
-        this.modifyUser = modifyUser;
+        this.userName = userName;
+        this.departmentName = departmentName;
     }
 }

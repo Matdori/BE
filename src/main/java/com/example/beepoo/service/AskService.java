@@ -82,8 +82,8 @@ public class AskService {
         ask.setType(AskTypeEnum.ASK);
         ask.setAskUser(CurrentUser.getUser(req));
         askRepository.save(ask);
-        // 비품 상태 변경
-        itemRepository.updateStatusBySeq(item.getSeq(), ItemStatusEnum.ASSIGNED);
+        // 비품 상태 및 요청자 변경
+        itemRepository.updateStatusAndaskUserBySeq(item.getSeq(), ItemStatusEnum.ASSIGNED, CurrentUser.getUser(req));
 
         return GlobalResponseDto.ok("요청 등록 성공");
     }
@@ -126,6 +126,8 @@ public class AskService {
 
         // 요청 취소
         ask.cancelAsk(askDto);
+        // 비품 상태 및 요청자 변경
+        itemRepository.updateStatusAndaskUserBySeq(ask.getItem().getSeq(), ItemStatusEnum.REGISTERED, null);
 
         return GlobalResponseDto.ok("요청 취소 성공");
     }

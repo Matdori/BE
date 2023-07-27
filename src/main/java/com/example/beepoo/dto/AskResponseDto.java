@@ -4,6 +4,7 @@ import com.example.beepoo.entity.Ask;
 import com.example.beepoo.entity.Item;
 import com.example.beepoo.entity.User;
 import com.example.beepoo.enums.AskTypeEnum;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AskResponseDto {
 
     private Integer seq;
