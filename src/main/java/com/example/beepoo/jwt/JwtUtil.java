@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseCookie.ResponseCookieBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -73,11 +75,23 @@ public class JwtUtil {
             token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
             Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token); // Name-Value
             cookie.setPath("/");
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true);
             // Response 객체에 Cookie 추가
             res.addCookie(cookie);
+            //ToDo[07] : 실험 중
+            res.addHeader("Set-Cookie", createTokenCookieBuilder(token).toString());
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    public ResponseCookieBuilder createTokenCookieBuilder(String token) {
+        return ResponseCookie.from(AUTHORIZATION_HEADER, token)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .sameSite(org.springframework.boot.web.server.Cookie.SameSite.NONE.attributeValue());
     }
 
 

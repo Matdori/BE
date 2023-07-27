@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -32,12 +33,12 @@ public class AuthFilter implements Filter {
             StringUtils.hasText(url) &&
             //ToDo[07] : 인증 필요없는 url 수정필요
             (
+                httpServletRequest.getMethod().equals(HttpMethod.OPTIONS.toString()) ||
                 url.startsWith("/api/user/login") ||
                 url.startsWith("/css") ||
                 url.startsWith("/js") ||
                 url.startsWith("/v3") ||
                 url.startsWith("/swagger")
-
             )
         ) {
             // 회원가입, 로그인 관련 API 는 인증 필요없이 요청 진행
