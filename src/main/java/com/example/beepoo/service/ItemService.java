@@ -3,13 +3,19 @@ package com.example.beepoo.service;
 import com.example.beepoo.dto.GlobalResponseDto;
 import com.example.beepoo.dto.ItemRequestDto;
 import com.example.beepoo.dto.ItemResponseDto;
+import com.example.beepoo.dto.ItemTypeRequestDto;
 import com.example.beepoo.entity.Item;
+import com.example.beepoo.entity.ItemType;
 import com.example.beepoo.enums.ItemStatusEnum;
 import com.example.beepoo.exception.CustomException;
 import com.example.beepoo.exception.ErrorCode;
 import com.example.beepoo.repository.ItemCustomRepository;
 import com.example.beepoo.repository.ItemRepository;
 import java.util.List;
+
+import com.example.beepoo.repository.ItemTypeRepository;
+import com.example.beepoo.util.CurrentUser;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +27,7 @@ public class ItemService {
 
     private final ItemRepository itemRepository;
     private final ItemCustomRepository itemCustomRepository;
+    private final ItemTypeRepository itemTypeRepository;
 
     @Transactional
     public GlobalResponseDto<List<ItemResponseDto>> getItemList(ItemRequestDto condition, Pageable pageable) {
@@ -41,7 +48,9 @@ public class ItemService {
     public GlobalResponseDto<String> insertItemList(ItemRequestDto[] itemDtos) {
         for (ItemRequestDto itemDto : itemDtos) {
             itemDto.setStatus(ItemStatusEnum.REGISTERED);
-            Item item = new Item(itemDto);
+            ItemType itemType = itemTypeRepository.findById(itemDto.getTypeCode())
+                    .orElseThrow(() -> new CustomException(ErrorCode.ITEM_TYPE_NOT_FOUND));
+            Item item = new Item(itemDto, itemType);
             itemRepository.save(item);
         }
 
@@ -69,5 +78,26 @@ public class ItemService {
         } else {
             return GlobalResponseDto.ok("사용 가능한 비품명", true);
         }
+    }
+
+    //Todo[07]
+    @Transactional
+    public GlobalResponseDto<String> createItemType(ItemTypeRequestDto itemTypeRequestDto, HttpServletRequest req) {
+        //중복확인
+        if (itemTypeRepository.existsItemTypeByType(itemTypeRequestDto.getType())){
+            throw new CustomException(ErrorCode.ITEM_TYPE_ALREADY_EXIST);
+        }
+
+        ItemType parentType = null;
+        if (itemTypeRequestDto.getParentTypeId() != null) {
+            parentType = itemTypeRepository.findById(itemTypeRequestDto.getTypeId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.ITEM_TYPE_NOT_FOUND));
+        }
+
+        ItemType itemType = new ItemType(itemTypeRequestDto, parentType);
+        itemType.setCreated(CurrentUser.getUser(req));
+
+        itemTypeRepository.save(itemType);
+        return null;
     }
 }

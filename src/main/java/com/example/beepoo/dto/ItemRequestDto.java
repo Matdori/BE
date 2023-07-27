@@ -10,7 +10,7 @@ public class ItemRequestDto {
 
     private Integer seq;
     private String name;
-    private Integer typeCode;
+    private Long typeCode;
     private ItemStatusEnum status;
     private String serial;
     private String comment;

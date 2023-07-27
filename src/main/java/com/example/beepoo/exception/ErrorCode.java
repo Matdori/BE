@@ -24,6 +24,9 @@ public enum ErrorCode {
     ITEM_ALREADY_EXIST(HttpStatus.CONFLICT.value(), "I002", "이미 존재하는 비품입니다."),
     ITEM_ALREADY_ASSIGNED(HttpStatus.CONFLICT.value(), "I003", "이미 할당된 비품입니다."),
     ITEM_ALREADY_DISCARD(HttpStatus.CONFLICT.value(), "I004", "이미 폐기된 비품입니다."),
+    ITEM_TYPE_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "T001", "해당 타입을 찾을 수 없습니다."),
+    ITEM_TYPE_ALREADY_EXIST(HttpStatus.CONFLICT.value(), "T002", "이미 존재하는 비품타입 입니다."),
+
 
     // 요청 Error Code
     ASK_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "A001", "존재하지 않는 요청입니다."),

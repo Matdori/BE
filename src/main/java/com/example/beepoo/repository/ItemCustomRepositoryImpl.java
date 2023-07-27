@@ -39,7 +39,7 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
                 new QItemResponseDto(
                     item.seq,
                     item.name,
-                    item.typeCode,
+                    item.typeCode.id,
                     item.status,
                     item.serial,
                     item.comment,
@@ -95,7 +95,7 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
             clause.set(item.name, itemDto.getName());
         }
         if (itemDto.getTypeCode() != null) {
-            clause.set(item.typeCode, itemDto.getTypeCode());
+            clause.set(item.typeCode.id, itemDto.getTypeCode());
         }
         if (itemDto.getStatus() != null) {
             clause.set(item.status, itemDto.getStatus());
@@ -118,8 +118,8 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
         return hasText(name) ? item.name.contains(name) : null;
     }
 
-    private BooleanExpression typeCodeEq(Integer typeCode) {
-        return typeCode != null ? item.typeCode.in(typeCode) : null;
+    private BooleanExpression typeCodeEq(Long typeCode) {
+        return typeCode != null ? item.typeCode.id.in(typeCode) : null;
     }
 
     private BooleanExpression statusEq(ItemStatusEnum status) {

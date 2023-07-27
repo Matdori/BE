@@ -41,7 +41,7 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
     public List<AskResponseDto> getAskList(AskRequestDto condition, Pageable pageable) {
         List<AskResponseDto> askList = jpaQueryFactory
             .select(
-                new QAskResponseDto(ask.seq, item.name, item.typeCode, ask.type, user.userName, confirmUser.userName)
+                new QAskResponseDto(ask.seq, item.name, item.typeCode.id, ask.type, user.userName, confirmUser.userName)
             )
             .from(ask)
             .join(ask.askUser, user)

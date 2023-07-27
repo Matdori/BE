@@ -2,12 +2,7 @@ package com.example.beepoo.entity;
 
 import com.example.beepoo.dto.ItemRequestDto;
 import com.example.beepoo.enums.ItemStatusEnum;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -26,9 +21,6 @@ public class Item extends TimeStamp {
     private String name;
 
     @Column(nullable = false)
-    private Integer typeCode;
-
-    @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private ItemStatusEnum status;
 
@@ -38,9 +30,12 @@ public class Item extends TimeStamp {
     @Column(nullable = true)
     private String comment;
 
-    public Item(ItemRequestDto item) {
+    @ManyToOne
+    private ItemType typeCode;
+
+    public Item(ItemRequestDto item, ItemType itemType) {
         this.name = item.getName();
-        this.typeCode = item.getTypeCode();
+        this.typeCode = itemType;
         this.status = item.getStatus();
         this.serial = item.getSerial();
         this.comment = item.getComment();
