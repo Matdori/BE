@@ -33,6 +33,10 @@ public class Item extends TimeStamp {
     @ManyToOne
     private ItemType typeCode;
 
+    @JoinColumn
+    @ManyToOne
+    private User askUser;
+
     public Item(ItemRequestDto item, ItemType itemType) {
         this.name = item.getName();
         this.typeCode = itemType;

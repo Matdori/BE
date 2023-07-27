@@ -1,6 +1,7 @@
 package com.example.beepoo.repository;
 
 import static com.example.beepoo.entity.QItem.item;
+import static com.example.beepoo.entity.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.example.beepoo.dto.ItemRequestDto;
@@ -44,12 +45,12 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
                     item.serial,
                     item.comment,
                     item.createDate,
-                    item.createUser,
-                    item.modifyDate,
-                    item.modifyUser
+                    item.askUser.userName,
+                    item.askUser.departmentName
                 )
             )
             .from(item)
+            .leftJoin(item.askUser, user)
             .where(
                 nameEq(condition.getName()),
                 typeCodeEq(condition.getTypeCode()),
