@@ -1,8 +1,6 @@
 package com.example.beepoo.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -15,13 +13,15 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-@Getter @Setter
+@Getter
+@Setter
 public abstract class TimeStamp {
 
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createDate;
 
+    //Todo[07]
     @CreatedBy
     @Column(updatable = false)
     private String createUser;
@@ -33,4 +33,8 @@ public abstract class TimeStamp {
     @LastModifiedBy
     @Column(updatable = true)
     private String modifyUser;
+
+    @ManyToOne
+    @JoinColumn(updatable = false, name = "created")
+    private User created;
 }

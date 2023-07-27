@@ -28,7 +28,7 @@ public class AskResponseDto {
 
     // 요청 목록 조회
     private String itemName;
-    private Integer itemTypeCode;
+    private Long itemTypeCode;
     private AskTypeEnum askType;
     private String askUserName;
     private String confirmUserName;
@@ -52,7 +52,7 @@ public class AskResponseDto {
     public AskResponseDto(
         Integer seq,
         String itemName,
-        Integer itemTypeCode,
+        Long itemTypeCode,
         AskTypeEnum askType,
         String askUserName,
         String confirmUserName

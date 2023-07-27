@@ -3,8 +3,10 @@ package com.example.beepoo.controller;
 import com.example.beepoo.dto.GlobalResponseDto;
 import com.example.beepoo.dto.ItemRequestDto;
 import com.example.beepoo.dto.ItemResponseDto;
+import com.example.beepoo.dto.ItemTypeRequestDto;
 import com.example.beepoo.service.ItemService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -60,5 +62,12 @@ public class ItemController {
     @ResponseStatus(HttpStatus.OK)
     public GlobalResponseDto<Boolean> checkItemName(@PathVariable String name) {
         return itemService.checkItemName(name);
+    }
+
+    // 비품 타입 등록
+    @PostMapping("/type")
+    public GlobalResponseDto<String> createItemType(@RequestBody ItemTypeRequestDto itemTypeRequestDto,
+                                                    HttpServletRequest req) {
+        return itemService.createItemType(itemTypeRequestDto, req);
     }
 }

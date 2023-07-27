@@ -13,7 +13,7 @@ public class ItemResponseDto {
 
     private Integer seq;
     private String name;
-    private Integer typeCode;
+    private Long typeCode;
     private ItemStatusEnum status;
     private String serial;
     private String comment;
@@ -25,7 +25,7 @@ public class ItemResponseDto {
     public ItemResponseDto(Item entity) {
         this.seq = entity.getSeq();
         this.name = entity.getName();
-        this.typeCode = entity.getTypeCode();
+        this.typeCode = entity.getTypeCode().getId();
         this.status = entity.getStatus();
         this.serial = entity.getSerial();
         this.comment = entity.getComment();
@@ -39,7 +39,7 @@ public class ItemResponseDto {
     public ItemResponseDto(
         Integer seq,
         String name,
-        Integer typeCode,
+        Long typeCode,
         ItemStatusEnum status,
         String serial,
         String comment,
