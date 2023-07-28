@@ -30,7 +30,7 @@ public class AskResponseDto {
 
     // 요청 목록 조회
     private String itemName;
-    private Long itemTypeCode;
+    private String itemType;
     private AskTypeEnum askType;
     private String askUserName;
     private String confirmUserName;
@@ -54,14 +54,14 @@ public class AskResponseDto {
     public AskResponseDto(
         Integer seq,
         String itemName,
-        Long itemTypeCode,
+        String itemType,
         AskTypeEnum askType,
         String askUserName,
         String confirmUserName
     ) {
         this.seq = seq;
         this.itemName = itemName;
-        this.itemTypeCode = itemTypeCode;
+        this.itemType = itemType;
         this.askType = askType;
         this.askUserName = askUserName;
         this.confirmUserName = confirmUserName;

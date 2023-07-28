@@ -23,6 +23,8 @@ public class AskRequestDto {
     private String modifyUser;
     // 비품명 검색 key
     private String itemName;
+    // 비품 종류 검색 key
+    private Long itemTypeCode;
     // 요청자 검색 key
     private String askUserName;
     // 처리자 검색 key
