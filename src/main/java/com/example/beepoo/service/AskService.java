@@ -15,7 +15,9 @@ import com.example.beepoo.repository.AskRepository;
 import com.example.beepoo.repository.ItemRepository;
 import com.example.beepoo.util.CurrentUser;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -154,5 +156,15 @@ public class AskService {
     @Transactional
     public GlobalResponseDto<Long> getAskCount() {
         return GlobalResponseDto.ok("요청 현황 건수", askRepository.countAskByType(AskTypeEnum.ASK));
+    }
+
+    @Transactional
+    public GlobalResponseDto<Map<AskTypeEnum, String>> getAskType() {
+        Map<AskTypeEnum, String> result = new HashMap<>();
+        for (AskTypeEnum askType : AskTypeEnum.values()) {
+            result.put(askType, askType.type());
+        }
+
+        return GlobalResponseDto.ok("요청 상태 조회 성공", result);
     }
 }
