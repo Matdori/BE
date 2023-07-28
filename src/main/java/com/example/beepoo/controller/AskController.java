@@ -3,10 +3,12 @@ package com.example.beepoo.controller;
 import com.example.beepoo.dto.AskRequestDto;
 import com.example.beepoo.dto.AskResponseDto;
 import com.example.beepoo.dto.GlobalResponseDto;
+import com.example.beepoo.enums.AskTypeEnum;
 import com.example.beepoo.service.AskService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/ask")
-@Tag(name="요청")
+@Tag(name = "요청")
 public class AskController {
 
     private final AskService askService;
@@ -70,5 +72,11 @@ public class AskController {
     @GetMapping("/count")
     public GlobalResponseDto<Long> getAskCount() {
         return askService.getAskCount();
+    }
+
+    // 요청 상태 조회
+    @GetMapping("/type")
+    public GlobalResponseDto<Map<AskTypeEnum, String>> getAskType() {
+        return askService.getAskType();
     }
 }
