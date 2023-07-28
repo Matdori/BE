@@ -41,13 +41,21 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
     public List<AskResponseDto> getAskList(AskRequestDto condition, Pageable pageable) {
         List<AskResponseDto> askList = jpaQueryFactory
             .select(
-                new QAskResponseDto(ask.seq, item.name, item.typeCode.id, ask.type, user.userName, confirmUser.userName)
+                new QAskResponseDto(
+                    ask.seq,
+                    item.name,
+                    item.typeCode.type,
+                    ask.type,
+                    user.userName,
+                    confirmUser.userName
+                )
             )
             .from(ask)
-            .join(ask.askUser, user)
+            .leftJoin(ask.askUser, user)
             .leftJoin(ask.confirmUser, confirmUser)
             .where(
                 itemNameEq(condition.getItemName()),
+                itemTypeCodeEq(condition.getItemTypeCode()),
                 askUserNameEq(condition.getAskUserName()),
                 confirmUserNameEq(condition.getConfirmUserName()),
                 typeEq(condition.getAskType()),
@@ -64,9 +72,14 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
         return askList;
     }
 
-    // item 테이블 name 으로 비품명으로 조회
+    // item 테이블 name 으로 비품명 조회
     private BooleanExpression itemNameEq(String itemName) {
         return hasText(itemName) ? item.name.contains(itemName) : null;
+    }
+
+    // item 테이블 typeCod 의 id 로 비품 종류 조회
+    private BooleanExpression itemTypeCodeEq(Long itemTypeCode) {
+        return itemTypeCode != null ? item.typeCode.id.in(itemTypeCode) : null;
     }
 
     // user 테이블 name 으로 요청자 조회
