@@ -1,9 +1,6 @@
 package com.example.beepoo.service;
 
-import com.example.beepoo.dto.GlobalResponseDto;
-import com.example.beepoo.dto.ItemRequestDto;
-import com.example.beepoo.dto.ItemResponseDto;
-import com.example.beepoo.dto.ItemTypeRequestDto;
+import com.example.beepoo.dto.*;
 import com.example.beepoo.entity.Item;
 import com.example.beepoo.entity.ItemType;
 import com.example.beepoo.enums.ItemStatusEnum;
@@ -82,22 +79,26 @@ public class ItemService {
 
     //Todo[07]
     @Transactional
-    public GlobalResponseDto<String> createItemType(ItemTypeRequestDto itemTypeRequestDto, HttpServletRequest req) {
+    public GlobalResponseDto<ItemTypeResponseDto> createItemType(ItemTypeRequestDto itemTypeRequestDto, HttpServletRequest req) {
         //중복확인
         if (itemTypeRepository.existsItemTypeByType(itemTypeRequestDto.getType())){
             throw new CustomException(ErrorCode.ITEM_TYPE_ALREADY_EXIST);
         }
 
         ItemType parentType = null;
+        Integer depth = 0;
         if (itemTypeRequestDto.getParentTypeId() != null) {
-            parentType = itemTypeRepository.findById(itemTypeRequestDto.getTypeId())
+            parentType = itemTypeRepository.findById(itemTypeRequestDto.getParentTypeId())
                     .orElseThrow(() -> new CustomException(ErrorCode.ITEM_TYPE_NOT_FOUND));
+            depth = parentType.getDepth() + 1;
         }
 
-        ItemType itemType = new ItemType(itemTypeRequestDto, parentType);
+        ItemType itemType = new ItemType(itemTypeRequestDto, parentType, depth);
         itemType.setCreated(CurrentUser.getUser(req));
 
         itemTypeRepository.save(itemType);
-        return null;
+        return GlobalResponseDto.ok("비품 종류 등록 성공", new ItemTypeResponseDto(itemType));
     }
+
+//    ToDo[07] : 비품타입 조회
 }

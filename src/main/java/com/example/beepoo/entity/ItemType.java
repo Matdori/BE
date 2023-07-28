@@ -26,14 +26,18 @@ public class ItemType extends TimeStamp{
     @JoinColumn(name = "parentTypeCode")
     private ItemType parentCode;
 
-    @Column
+    @Column(nullable = false)
     private String type;
+
+    @Column
+    private Integer depth;
 
     @OneToMany
     private List<Item> itemList = new ArrayList<>();
 
-    public ItemType(ItemTypeRequestDto itemTypeRequestDto, ItemType parentType) {
+    public ItemType(ItemTypeRequestDto itemTypeRequestDto, ItemType parentType, Integer depth) {
         this.parentCode = parentType;
         this.type = itemTypeRequestDto.getType();
+        this.depth = depth;
     }
 }
