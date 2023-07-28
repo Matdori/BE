@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class ItemTypeRequestDto {
 
-    private Long typeId;
+//    private Long typeId;
 
     private String type;
 

@@ -1,9 +1,6 @@
 package com.example.beepoo.controller;
 
-import com.example.beepoo.dto.GlobalResponseDto;
-import com.example.beepoo.dto.ItemRequestDto;
-import com.example.beepoo.dto.ItemResponseDto;
-import com.example.beepoo.dto.ItemTypeRequestDto;
+import com.example.beepoo.dto.*;
 import com.example.beepoo.service.ItemService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -66,8 +63,8 @@ public class ItemController {
 
     // 비품 타입 등록
     @PostMapping("/type")
-    public GlobalResponseDto<String> createItemType(@RequestBody ItemTypeRequestDto itemTypeRequestDto,
-                                                    HttpServletRequest req) {
+    public GlobalResponseDto<ItemTypeResponseDto> createItemType(@RequestBody ItemTypeRequestDto itemTypeRequestDto,
+                                                                 HttpServletRequest req) {
         return itemService.createItemType(itemTypeRequestDto, req);
     }
 }

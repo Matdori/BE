@@ -9,12 +9,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DepartmentResponseDto {
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String departmentName;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer count;
 
     public DepartmentResponseDto(Department department){
