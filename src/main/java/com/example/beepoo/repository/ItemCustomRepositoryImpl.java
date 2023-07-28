@@ -40,7 +40,7 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
                 new QItemResponseDto(
                     item.seq,
                     item.name,
-                    item.typeCode.id,
+                    item.typeCode.type,
                     item.status,
                     item.serial,
                     item.comment,

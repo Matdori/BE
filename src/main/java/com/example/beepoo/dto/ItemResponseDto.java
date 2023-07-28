@@ -15,7 +15,7 @@ public class ItemResponseDto {
 
     private Integer seq;
     private String name;
-    private Long typeCode;
+    private String type;
     private ItemStatusEnum status;
     private String serial;
     private String comment;
@@ -30,7 +30,7 @@ public class ItemResponseDto {
     public ItemResponseDto(Item entity) {
         this.seq = entity.getSeq();
         this.name = entity.getName();
-        this.typeCode = entity.getTypeCode().getId();
+        this.type = entity.getTypeCode().getType();
         this.status = entity.getStatus();
         this.serial = entity.getSerial();
         this.comment = entity.getComment();
@@ -44,7 +44,7 @@ public class ItemResponseDto {
     public ItemResponseDto(
         Integer seq,
         String name,
-        Long typeCode,
+        String type,
         ItemStatusEnum status,
         String serial,
         String comment,
@@ -54,7 +54,7 @@ public class ItemResponseDto {
     ) {
         this.seq = seq;
         this.name = name;
-        this.typeCode = typeCode;
+        this.type = type;
         this.status = status;
         this.serial = serial;
         this.comment = comment;
