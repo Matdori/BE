@@ -8,11 +8,11 @@ import com.example.beepoo.exception.CustomException;
 import com.example.beepoo.exception.ErrorCode;
 import com.example.beepoo.repository.ItemCustomRepository;
 import com.example.beepoo.repository.ItemRepository;
-import java.util.List;
-
 import com.example.beepoo.repository.ItemTypeRepository;
 import com.example.beepoo.util.CurrentUser;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,9 +28,11 @@ public class ItemService {
 
     @Transactional
     public GlobalResponseDto<List<ItemResponseDto>> getItemList(ItemRequestDto condition, Pageable pageable) {
-        List<ItemResponseDto> itemList = itemCustomRepository.getItemList(condition, pageable);
+        Map<String, Object> itemInfo = itemCustomRepository.getItemList(condition, pageable);
+        long totalCnt = (long) itemInfo.get("totalCnt");
+        List<ItemResponseDto> itemList = (List<ItemResponseDto>) itemInfo.get("itemList");
 
-        return GlobalResponseDto.ok("비품 목록 조회 성공", itemList);
+        return GlobalResponseDto.ok("비품 목록 조회 성공", itemList, totalCnt);
     }
 
     @Transactional
@@ -45,8 +47,9 @@ public class ItemService {
     public GlobalResponseDto<String> insertItemList(ItemRequestDto[] itemDtos) {
         for (ItemRequestDto itemDto : itemDtos) {
             itemDto.setStatus(ItemStatusEnum.REGISTERED);
-            ItemType itemType = itemTypeRepository.findById(itemDto.getTypeCode())
-                    .orElseThrow(() -> new CustomException(ErrorCode.ITEM_TYPE_NOT_FOUND));
+            ItemType itemType = itemTypeRepository
+                .findById(itemDto.getTypeCode())
+                .orElseThrow(() -> new CustomException(ErrorCode.ITEM_TYPE_NOT_FOUND));
             Item item = new Item(itemDto, itemType);
             itemRepository.save(item);
         }
@@ -79,16 +82,21 @@ public class ItemService {
 
     //Todo[07]
     @Transactional
-    public GlobalResponseDto<ItemTypeResponseDto> createItemType(ItemTypeRequestDto itemTypeRequestDto, HttpServletRequest req) {
+    public GlobalResponseDto<ItemTypeResponseDto> createItemType(
+        ItemTypeRequestDto itemTypeRequestDto,
+        HttpServletRequest req
+    ) {
         //중복확인
-        if (itemTypeRepository.existsItemTypeByType(itemTypeRequestDto.getType())){
+        if (itemTypeRepository.existsItemTypeByType(itemTypeRequestDto.getType())) {
             throw new CustomException(ErrorCode.ITEM_TYPE_ALREADY_EXIST);
         }
 
         ItemType parentType = null;
         Integer depth = 0;
         if (itemTypeRequestDto.getParentTypeId() != null) {
-            parentType = itemTypeRepository.findById(itemTypeRequestDto.getParentTypeId())
+            parentType =
+                itemTypeRepository
+                    .findById(itemTypeRequestDto.getParentTypeId())
                     .orElseThrow(() -> new CustomException(ErrorCode.ITEM_TYPE_NOT_FOUND));
             depth = parentType.getDepth() + 1;
         }
@@ -99,6 +107,5 @@ public class ItemService {
         itemTypeRepository.save(itemType);
         return GlobalResponseDto.ok("비품 종류 등록 성공", new ItemTypeResponseDto(itemType));
     }
-
-//    ToDo[07] : 비품타입 조회
+    //    ToDo[07] : 비품타입 조회
 }

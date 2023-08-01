@@ -17,7 +17,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
@@ -34,7 +36,10 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
-    public List<ItemResponseDto> getItemList(ItemRequestDto condition, Pageable pageable) {
+    public Map<String, Object> getItemList(ItemRequestDto condition, Pageable pageable) {
+        Map<String, Object> result = new HashMap<>();
+
+        // 검색된 비품 목록 데이터
         List<ItemResponseDto> itemList = jpaQueryFactory
             .select(
                 new QItemResponseDto(
@@ -67,26 +72,29 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
             .orderBy(OrderBy(pageable))
             .fetch();
 
-        /*// 현재 페이지 개수
-        int itemCnt = itemList.size();
-        // 전체 개수
-        long totalItemCnt = jpaQueryFactory
-                .select(item.count())
-                .from(item)
-                .where(
-                        nameEq(condition.getName()),
-                        typeCodeEq(condition.getTypeCode()),
-                        statusCodeEq(condition.getStatusCode()),
-                        serialEq(condition.getSerial()),
-                        commentEq(condition.getComment()),
-                        createDateRangeEq(condition.getCreateDate()),
-                        createUserEq(condition.getCreateUser()),
-                        modifyDateRangeEq(condition.getModifyDate()),
-                        modifyUserEq(condition.getModifyUser())
-                )
-                .fetchCount();*/
+        // 현재 페이지 개수
+        // int itemCnt = itemList.size();
+        // 검색된 비품 목록 전체 개수
+        long totalCnt = jpaQueryFactory
+            .select(item.count())
+            .from(item)
+            .where(
+                nameEq(condition.getName()),
+                typeCodeEq(condition.getTypeCode()),
+                statusEq(condition.getStatus()),
+                serialEq(condition.getSerial()),
+                commentEq(condition.getComment()),
+                createDateRangeEq(condition.getCreateDate()),
+                createUserEq(condition.getCreateUser()),
+                modifyDateRangeEq(condition.getModifyDate()),
+                modifyUserEq(condition.getModifyUser())
+            )
+            .fetchCount();
 
-        return itemList;
+        result.put("totalCnt", totalCnt);
+        result.put("itemList", itemList);
+
+        return result;
     }
 
     @Override

@@ -18,7 +18,9 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
@@ -38,7 +40,10 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
     QUser confirmUser = new QUser("confirmUser");
 
     @Override
-    public List<AskResponseDto> getAskList(AskRequestDto condition, Pageable pageable) {
+    public Map<String, Object> getAskList(AskRequestDto condition, Pageable pageable) {
+        Map<String, Object> result = new HashMap<>();
+
+        // 검색된 요청 목록 데이터
         List<AskResponseDto> askList = jpaQueryFactory
             .select(
                 new QAskResponseDto(
@@ -69,7 +74,29 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
             .orderBy(OrderBy(pageable))
             .fetch();
 
-        return askList;
+        // 검색된 요청 목록 전체 개수
+        long totalCnt = jpaQueryFactory
+            .select(ask.count())
+            .from(ask)
+            .leftJoin(ask.askUser, user)
+            .leftJoin(ask.confirmUser, confirmUser)
+            .where(
+                itemNameEq(condition.getItemName()),
+                itemTypeCodeEq(condition.getItemTypeCode()),
+                askUserNameEq(condition.getAskUserName()),
+                confirmUserNameEq(condition.getConfirmUserName()),
+                typeEq(condition.getAskType()),
+                createDateRangeEq(condition.getCreateDate()),
+                createUserEq(condition.getCreateUser()),
+                modifyDateRangeEq(condition.getModifyDate()),
+                modifyUserEq(condition.getModifyUser())
+            )
+            .fetchCount();
+
+        result.put("totalCnt", totalCnt);
+        result.put("askList", askList);
+
+        return result;
     }
 
     // item 테이블 name 으로 비품명 조회

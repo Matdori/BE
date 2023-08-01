@@ -43,9 +43,11 @@ public class AskService {
         }
 
         // 요청 목록 조회
-        List<AskResponseDto> askList = askCustomRepository.getAskList(condition, pageable);
+        Map<String, Object> askInfo = askCustomRepository.getAskList(condition, pageable);
+        long totalCnt = (long) askInfo.get("totalCnt");
+        List<AskResponseDto> askList = (List<AskResponseDto>) askInfo.get("askList");
 
-        return GlobalResponseDto.ok("요청 목록 조회 성공", askList);
+        return GlobalResponseDto.ok("요청 목록 조회 성공", askList, totalCnt);
     }
 
     @Transactional

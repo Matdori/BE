@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
@@ -16,15 +15,26 @@ public class GlobalResponseDto<T> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
-    public GlobalResponseDto(String msg){
+    private long totalCnt;
+
+    public GlobalResponseDto(String msg) {
         this.msg = msg;
     }
 
-    public static <T> GlobalResponseDto <T> ok(String msg, T data){
+    public GlobalResponseDto(String msg, T data) {
+        this.msg = msg;
+        this.data = data;
+    }
+
+    public static <T> GlobalResponseDto<T> ok(String msg, T data) {
         return new GlobalResponseDto<>(msg, data);
     }
 
-    public static GlobalResponseDto ok(String msg){
+    public static GlobalResponseDto ok(String msg) {
         return new GlobalResponseDto(msg);
+    }
+
+    public static <T> GlobalResponseDto<T> ok(String msg, T data, long totalCnt) {
+        return new GlobalResponseDto<>(msg, data, totalCnt);
     }
 }
