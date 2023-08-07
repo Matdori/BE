@@ -1,9 +1,5 @@
 package com.example.beepoo.repository;
 
-import static com.example.beepoo.entity.QItem.item;
-import static com.example.beepoo.entity.QUser.user;
-import static org.springframework.util.StringUtils.hasText;
-
 import com.example.beepoo.dto.ItemRequestDto;
 import com.example.beepoo.dto.ItemResponseDto;
 import com.example.beepoo.dto.QItemResponseDto;
@@ -15,14 +11,19 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Repository;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Repository;
+
+import static com.example.beepoo.entity.QItem.item;
+import static com.example.beepoo.entity.QUser.user;
+import static org.springframework.util.StringUtils.hasText;
 
 @Repository
 public class ItemCustomRepositoryImpl implements ItemCustomRepository {
@@ -41,55 +42,56 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
 
         // 검색된 비품 목록 데이터
         List<ItemResponseDto> itemList = jpaQueryFactory
-            .select(
-                new QItemResponseDto(
-                    item.seq,
-                    item.name,
-                    item.typeCode.type,
-                    item.status,
-                    item.serial,
-                    item.comment,
-                    item.createDate,
-                    item.askUser.userName,
-                    item.askUser.departmentName
+                .select(
+                        new QItemResponseDto(
+                                item.seq,
+                                item.name,
+                                item.typeCode.type,
+                                item.status,
+                                item.serial,
+                                item.comment,
+                                item.createDate,
+                                item.askUser.userName,
+                                item.askUser.departmentName
+                        )
                 )
-            )
-            .from(item)
-            .leftJoin(item.askUser, user)
-            .where(
-                nameEq(condition.getName()),
-                typeCodeEq(condition.getTypeCode()),
-                statusEq(condition.getStatus()),
-                serialEq(condition.getSerial()),
-                commentEq(condition.getComment()),
-                createDateRangeEq(condition.getCreateDate()),
-                createUserEq(condition.getCreateUser()),
-                modifyDateRangeEq(condition.getModifyDate()),
-                modifyUserEq(condition.getModifyUser())
-            )
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .orderBy(OrderBy(pageable))
-            .fetch();
+                .from(item)
+                .leftJoin(item.askUser, user)
+                .where(
+                        nameEq(condition.getName()),
+                        askUserNameEq(condition.getUserName()),
+                        typeCodeEq(condition.getTypeCode()),
+                        statusEq(condition.getStatus()),
+                        serialEq(condition.getSerial()),
+                        commentEq(condition.getComment()),
+                        startDateEq(condition.getStartDate()),
+                        endDateEq(condition.getEndDate()),
+                        modifyUserEq(condition.getModifyUser())
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(OrderBy(pageable))
+                .fetch();
 
         // 현재 페이지 개수
         // int itemCnt = itemList.size();
         // 검색된 비품 목록 전체 개수
         long totalCnt = jpaQueryFactory
-            .select(item.count())
-            .from(item)
-            .where(
-                nameEq(condition.getName()),
-                typeCodeEq(condition.getTypeCode()),
-                statusEq(condition.getStatus()),
-                serialEq(condition.getSerial()),
-                commentEq(condition.getComment()),
-                createDateRangeEq(condition.getCreateDate()),
-                createUserEq(condition.getCreateUser()),
-                modifyDateRangeEq(condition.getModifyDate()),
-                modifyUserEq(condition.getModifyUser())
-            )
-            .fetchCount();
+                .select(item.count())
+                .from(item)
+                .where(
+                        nameEq(condition.getName()),
+                        askUserNameEq(condition.getUserName()),
+                        typeCodeEq(condition.getTypeCode()),
+                        statusEq(condition.getStatus()),
+                        serialEq(condition.getSerial()),
+                        commentEq(condition.getComment()),
+                        startDateEq(condition.getStartDate()),
+                        endDateEq(condition.getEndDate()),
+                        createUserEq(condition.getCreateUser()),
+                        modifyUserEq(condition.getModifyUser())
+                )
+                .fetchCount();
 
         result.put("totalCnt", totalCnt);
         result.put("itemList", itemList);
@@ -127,6 +129,10 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
         return hasText(name) ? item.name.contains(name) : null;
     }
 
+    private BooleanExpression askUserNameEq(String userName) {
+        return hasText(userName) ? item.askUser.userName.contains(userName) : null;
+    }
+
     private BooleanExpression typeCodeEq(Long typeCode) {
         return typeCode != null ? item.typeCode.id.in(typeCode) : null;
     }
@@ -143,36 +149,18 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
         return hasText(comment) ? item.comment.contains(comment) : null;
     }
 
-    private BooleanExpression createDateRangeEq(String createDateRange) {
-        if (hasText(createDateRange)) {
-            String start = createDateRange.split("~")[0] + " 00:00:00";
-            String end = createDateRange.split("~")[1] + " 23:59:59";
+    private BooleanExpression startDateEq(String startDate) {
+        return hasText(startDate) ?
+                item.createDate.goe(LocalDateTime.parse(startDate + " 00:00:00", formatter)) : null;
+    }
 
-            LocalDateTime startDate = LocalDateTime.parse(start, formatter);
-            LocalDateTime endDate = LocalDateTime.parse(end, formatter);
-
-            return item.createDate.between(startDate, endDate);
-        } else {
-            return null;
-        }
+    private BooleanExpression endDateEq(String endDate) {
+        return hasText(endDate) ?
+                item.createDate.goe(LocalDateTime.parse(endDate + " 00:00:00", formatter)) : null;
     }
 
     private BooleanExpression createUserEq(String createUser) {
         return hasText(createUser) ? item.createUser.contains(createUser) : null;
-    }
-
-    private BooleanExpression modifyDateRangeEq(String modifyDateRange) {
-        if (hasText(modifyDateRange)) {
-            String start = modifyDateRange.split("~")[0] + " 00:00:00";
-            String end = modifyDateRange.split("~")[1] + " 23:59:59";
-
-            LocalDateTime startDate = LocalDateTime.parse(start, formatter);
-            LocalDateTime endDate = LocalDateTime.parse(end, formatter);
-
-            return item.modifyDate.between(startDate, endDate);
-        } else {
-            return null;
-        }
     }
 
     private BooleanExpression modifyUserEq(String modifyUser) {

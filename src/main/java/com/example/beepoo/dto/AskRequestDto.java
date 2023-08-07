@@ -17,7 +17,9 @@ public class AskRequestDto {
     private String askImg;
     private User confirmUser;
     private String confirmMsg;
-    private String createDate;
+    //ToDo[07] 날짜 형식 Validation
+    private String startDate;
+    private String endDate;
     private String createUser;
     private String modifyDate;
     private String modifyUser;

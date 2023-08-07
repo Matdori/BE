@@ -1,10 +1,5 @@
 package com.example.beepoo.repository;
 
-import static com.example.beepoo.entity.QAsk.ask;
-import static com.example.beepoo.entity.QItem.item;
-import static com.example.beepoo.entity.QUser.user;
-import static org.springframework.util.StringUtils.hasText;
-
 import com.example.beepoo.dto.AskRequestDto;
 import com.example.beepoo.dto.AskResponseDto;
 import com.example.beepoo.dto.QAskResponseDto;
@@ -16,14 +11,20 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Repository;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Repository;
+
+import static com.example.beepoo.entity.QAsk.ask;
+import static com.example.beepoo.entity.QItem.item;
+import static com.example.beepoo.entity.QUser.user;
+import static org.springframework.util.StringUtils.hasText;
 
 @Repository
 public class AskCustomRepositoryImpl implements AskCustomRepository {
@@ -45,53 +46,53 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
 
         // 검색된 요청 목록 데이터
         List<AskResponseDto> askList = jpaQueryFactory
-            .select(
-                new QAskResponseDto(
-                    ask.seq,
-                    item.name,
-                    item.typeCode.type,
-                    ask.type,
-                    user.userName,
-                    confirmUser.userName
+                .select(
+                        new QAskResponseDto(
+                                ask.seq,
+                                item.name,
+                                item.typeCode.type,
+                                ask.type,
+                                user.userName,
+                                confirmUser.userName
+                        )
                 )
-            )
-            .from(ask)
-            .leftJoin(ask.askUser, user)
-            .leftJoin(ask.confirmUser, confirmUser)
-            .where(
-                itemNameEq(condition.getItemName()),
-                itemTypeCodeEq(condition.getItemTypeCode()),
-                askUserNameEq(condition.getAskUserName()),
-                confirmUserNameEq(condition.getConfirmUserName()),
-                typeEq(condition.getAskType()),
-                createDateRangeEq(condition.getCreateDate()),
-                createUserEq(condition.getCreateUser()),
-                modifyDateRangeEq(condition.getModifyDate()),
-                modifyUserEq(condition.getModifyUser())
-            )
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .orderBy(OrderBy(pageable))
-            .fetch();
+                .from(ask)
+                .leftJoin(ask.askUser, user)
+                .leftJoin(ask.confirmUser, confirmUser)
+                .where(
+                        itemNameEq(condition.getItemName()),
+                        itemTypeCodeEq(condition.getItemTypeCode()),
+                        askUserNameEq(condition.getAskUserName()),
+                        confirmUserNameEq(condition.getConfirmUserName()),
+                        typeEq(condition.getAskType()),
+                        startDateEq(condition.getStartDate()),
+                        endDateEq(condition.getEndDate()),
+                        createUserEq(condition.getCreateUser()),
+                        modifyUserEq(condition.getModifyUser())
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(OrderBy(pageable))
+                .fetch();
 
         // 검색된 요청 목록 전체 개수
         long totalCnt = jpaQueryFactory
-            .select(ask.count())
-            .from(ask)
-            .leftJoin(ask.askUser, user)
-            .leftJoin(ask.confirmUser, confirmUser)
-            .where(
-                itemNameEq(condition.getItemName()),
-                itemTypeCodeEq(condition.getItemTypeCode()),
-                askUserNameEq(condition.getAskUserName()),
-                confirmUserNameEq(condition.getConfirmUserName()),
-                typeEq(condition.getAskType()),
-                createDateRangeEq(condition.getCreateDate()),
-                createUserEq(condition.getCreateUser()),
-                modifyDateRangeEq(condition.getModifyDate()),
-                modifyUserEq(condition.getModifyUser())
-            )
-            .fetchCount();
+                .select(ask.count())
+                .from(ask)
+                .leftJoin(ask.askUser, user)
+                .leftJoin(ask.confirmUser, confirmUser)
+                .where(
+                        itemNameEq(condition.getItemName()),
+                        itemTypeCodeEq(condition.getItemTypeCode()),
+                        askUserNameEq(condition.getAskUserName()),
+                        confirmUserNameEq(condition.getConfirmUserName()),
+                        typeEq(condition.getAskType()),
+                        startDateEq(condition.getStartDate()),
+                        endDateEq(condition.getEndDate()),
+                        createUserEq(condition.getCreateUser()),
+                        modifyUserEq(condition.getModifyUser())
+                )
+                .fetchCount();
 
         result.put("totalCnt", totalCnt);
         result.put("askList", askList);
@@ -123,36 +124,18 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
         return type != null ? ask.type.in(type) : null;
     }
 
-    private BooleanExpression createDateRangeEq(String createDateRange) {
-        if (hasText(createDateRange)) {
-            String start = createDateRange.split("~")[0] + " 00:00:00";
-            String end = createDateRange.split("~")[1] + " 23:59:59";
+    private BooleanExpression startDateEq(String startDate) {
+        return hasText(startDate) ?
+                ask.createDate.goe(LocalDateTime.parse(startDate + " 00:00:00", formatter)) : null;
+    }
 
-            LocalDateTime startDate = LocalDateTime.parse(start, formatter);
-            LocalDateTime endDate = LocalDateTime.parse(end, formatter);
-
-            return ask.createDate.between(startDate, endDate);
-        } else {
-            return null;
-        }
+    private BooleanExpression endDateEq(String endDate) {
+        return hasText(endDate) ?
+                ask.createDate.goe(LocalDateTime.parse(endDate + " 00:00:00", formatter)) : null;
     }
 
     private BooleanExpression createUserEq(String createUser) {
         return hasText(createUser) ? ask.createUser.contains(createUser) : null;
-    }
-
-    private BooleanExpression modifyDateRangeEq(String modifyDateRange) {
-        if (hasText(modifyDateRange)) {
-            String start = modifyDateRange.split("~")[0] + " 00:00:00";
-            String end = modifyDateRange.split("~")[1] + " 23:59:59";
-
-            LocalDateTime startDate = LocalDateTime.parse(start, formatter);
-            LocalDateTime endDate = LocalDateTime.parse(end, formatter);
-
-            return ask.modifyDate.between(startDate, endDate);
-        } else {
-            return null;
-        }
     }
 
     private BooleanExpression modifyUserEq(String modifyUser) {
