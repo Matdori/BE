@@ -33,7 +33,7 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
         this.jpaQueryFactory = jpaQueryFactory;
     }
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public Map<String, Object> getItemList(ItemRequestDto condition, Pageable pageable) {
