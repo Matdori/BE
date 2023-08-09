@@ -80,7 +80,7 @@ public class JwtUtil {
             // Response 객체에 Cookie 추가
             res.addCookie(cookie);
             //ToDo[07] : 실험 중
-            res.addHeader("Set-Cookie", createTokenCookieBuilder(token).toString());
+            res.addHeader("Set-Cookie", createTokenCookieBuilder(token).build().toString());
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getMessage());
         }
@@ -91,6 +91,7 @@ public class JwtUtil {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
+                .domain("3.39.86.19")
                 .sameSite(org.springframework.boot.web.server.Cookie.SameSite.NONE.attributeValue());
     }
 
