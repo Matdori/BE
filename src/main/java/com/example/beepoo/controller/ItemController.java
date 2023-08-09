@@ -1,6 +1,7 @@
 package com.example.beepoo.controller;
 
 import com.example.beepoo.dto.*;
+import com.example.beepoo.enums.ItemStatusEnum;
 import com.example.beepoo.service.ItemService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -67,4 +69,17 @@ public class ItemController {
                                                                  HttpServletRequest req) {
         return itemService.createItemType(itemTypeRequestDto, req);
     }
+
+    // 비품 타입 조회
+    @GetMapping("/type")
+    public GlobalResponseDto<Map<Long, String>> getItemType() {
+        return itemService.getItemType();
+    }
+
+    //비품 상태 조회
+    @GetMapping("/status")
+    public GlobalResponseDto<Map<String, String>> getItemStatus() {
+        return itemService.getItemStatus();
+    }
+
 }

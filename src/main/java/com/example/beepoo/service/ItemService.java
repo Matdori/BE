@@ -11,6 +11,9 @@ import com.example.beepoo.repository.ItemRepository;
 import com.example.beepoo.repository.ItemTypeRepository;
 import com.example.beepoo.util.CurrentUser;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -107,5 +110,24 @@ public class ItemService {
         itemTypeRepository.save(itemType);
         return GlobalResponseDto.ok("비품 종류 등록 성공", new ItemTypeResponseDto(itemType));
     }
-    //    ToDo[07] : 비품타입 조회
+
+    @Transactional
+    public GlobalResponseDto<Map<Long, String>> getItemType() {
+        Map<Long, String> responseMap = new HashMap<>();
+        List<ItemType> itemTypeList = itemTypeRepository.findAll();
+        for (ItemType itemType : itemTypeList) {
+            responseMap.put(itemType.getId(), itemType.getType());
+        }
+        return GlobalResponseDto.ok("비품 종류 조회 성공", responseMap);
+    }
+
+    @Transactional
+    public GlobalResponseDto<Map<String, String>> getItemStatus() {
+        Map<String, String> responseMap = new HashMap<>();
+        for(ItemStatusEnum statusEnum : ItemStatusEnum.values()){
+            responseMap.put(statusEnum.name(), statusEnum.status());
+        }
+        return GlobalResponseDto.ok("비품 상태 조회 성공", responseMap);
+    }
+
 }
