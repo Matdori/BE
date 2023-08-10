@@ -66,8 +66,9 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
                         commentEq(condition.getComment()),
                         startDateEq(condition.getStartDate()),
                         endDateEq(condition.getEndDate()),
-                        modifyUserEq(condition.getModifyUser())
-                )
+                        modifyUserEq(condition.getModifyUser()),
+                        departmentNameEq(condition.getDepartmentName())
+                        )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(OrderBy(pageable))
@@ -89,7 +90,8 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
                         startDateEq(condition.getStartDate()),
                         endDateEq(condition.getEndDate()),
                         createUserEq(condition.getCreateUser()),
-                        modifyUserEq(condition.getModifyUser())
+                        modifyUserEq(condition.getModifyUser()),
+                        departmentNameEq(condition.getDepartmentName())
                 )
                 .fetchCount();
 
@@ -165,6 +167,10 @@ public class ItemCustomRepositoryImpl implements ItemCustomRepository {
 
     private BooleanExpression modifyUserEq(String modifyUser) {
         return hasText(modifyUser) ? item.modifyUser.contains(modifyUser) : null;
+    }
+
+    private BooleanExpression departmentNameEq(String departmentName) {
+        return hasText(departmentName) ? item.askUser.departmentName.contains(departmentName) : null;
     }
 
     private OrderSpecifier OrderBy(Pageable pageable) {

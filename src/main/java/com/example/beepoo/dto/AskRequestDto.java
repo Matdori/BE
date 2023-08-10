@@ -31,4 +31,6 @@ public class AskRequestDto {
     private String askUserName;
     // 처리자 검색 key
     private String confirmUserName;
+    // 요청자 부서 검색 key
+    private String departmentName;
 }

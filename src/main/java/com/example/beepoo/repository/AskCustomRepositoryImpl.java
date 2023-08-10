@@ -53,7 +53,8 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
                                 item.typeCode.type,
                                 ask.type,
                                 user.userName,
-                                confirmUser.userName
+                                confirmUser.userName,
+                                ask.askUser.departmentName
                         )
                 )
                 .from(ask)
@@ -68,7 +69,8 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
                         startDateEq(condition.getStartDate()),
                         endDateEq(condition.getEndDate()),
                         createUserEq(condition.getCreateUser()),
-                        modifyUserEq(condition.getModifyUser())
+                        modifyUserEq(condition.getModifyUser()),
+                        departmentNameEq(condition.getDepartmentName())
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -90,7 +92,8 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
                         startDateEq(condition.getStartDate()),
                         endDateEq(condition.getEndDate()),
                         createUserEq(condition.getCreateUser()),
-                        modifyUserEq(condition.getModifyUser())
+                        modifyUserEq(condition.getModifyUser()),
+                        departmentNameEq(condition.getDepartmentName())
                 )
                 .fetchCount();
 
@@ -140,6 +143,10 @@ public class AskCustomRepositoryImpl implements AskCustomRepository {
 
     private BooleanExpression modifyUserEq(String modifyUser) {
         return hasText(modifyUser) ? ask.modifyUser.contains(modifyUser) : null;
+    }
+
+    private BooleanExpression departmentNameEq(String departmentName) {
+        return hasText(departmentName) ? item.askUser.departmentName.contains(departmentName) : null;
     }
 
     private OrderSpecifier OrderBy(Pageable pageable) {
