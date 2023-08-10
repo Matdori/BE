@@ -3,6 +3,7 @@ package com.example.beepoo.service;
 import com.example.beepoo.dto.AskRequestDto;
 import com.example.beepoo.dto.AskResponseDto;
 import com.example.beepoo.dto.GlobalResponseDto;
+import com.example.beepoo.dto.MapResponseDto;
 import com.example.beepoo.entity.Ask;
 import com.example.beepoo.entity.Item;
 import com.example.beepoo.enums.AskTypeEnum;
@@ -15,7 +16,9 @@ import com.example.beepoo.repository.AskRepository;
 import com.example.beepoo.repository.ItemRepository;
 import com.example.beepoo.util.CurrentUser;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.HashMap;
+
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -161,12 +164,12 @@ public class AskService {
     }
 
     @Transactional
-    public GlobalResponseDto<Map<AskTypeEnum, String>> getAskType() {
-        Map<AskTypeEnum, String> result = new HashMap<>();
+    public GlobalResponseDto<List<MapResponseDto<AskTypeEnum, String>>> getAskType() {
+        List<MapResponseDto<AskTypeEnum, String>> responseList = new ArrayList<>();
         for (AskTypeEnum askType : AskTypeEnum.values()) {
-            result.put(askType, askType.type());
+            responseList.add(new MapResponseDto<>(askType));
         }
 
-        return GlobalResponseDto.ok("요청 상태 조회 성공", result);
+        return GlobalResponseDto.ok("요청 상태 조회 성공", responseList);
     }
 }
