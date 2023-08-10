@@ -12,8 +12,8 @@ import com.example.beepoo.repository.ItemTypeRepository;
 import com.example.beepoo.util.CurrentUser;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -112,22 +112,22 @@ public class ItemService {
     }
 
     @Transactional
-    public GlobalResponseDto<Map<Long, String>> getItemType() {
-        Map<Long, String> responseMap = new HashMap<>();
+    public GlobalResponseDto<List<MapResponseDto<Long, String>>> getItemType() {
+        List<MapResponseDto<Long, String>> responseList = new ArrayList<>();
         List<ItemType> itemTypeList = itemTypeRepository.findAll();
         for (ItemType itemType : itemTypeList) {
-            responseMap.put(itemType.getId(), itemType.getType());
+            responseList.add(new MapResponseDto<>(itemType));
         }
-        return GlobalResponseDto.ok("비품 종류 조회 성공", responseMap);
+        return GlobalResponseDto.ok("비품 종류 조회 성공", responseList);
     }
 
     @Transactional
-    public GlobalResponseDto<Map<String, String>> getItemStatus() {
-        Map<String, String> responseMap = new HashMap<>();
+    public GlobalResponseDto<List<MapResponseDto<String, String>>> getItemStatus() {
+        List<MapResponseDto<String, String>> responseList = new ArrayList<>();
         for(ItemStatusEnum statusEnum : ItemStatusEnum.values()){
-            responseMap.put(statusEnum.name(), statusEnum.status());
+            responseList.add(new MapResponseDto<>(statusEnum));
         }
-        return GlobalResponseDto.ok("비품 상태 조회 성공", responseMap);
+        return GlobalResponseDto.ok("비품 상태 조회 성공", responseList);
     }
 
 }

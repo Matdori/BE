@@ -3,12 +3,13 @@ package com.example.beepoo.controller;
 import com.example.beepoo.dto.AskRequestDto;
 import com.example.beepoo.dto.AskResponseDto;
 import com.example.beepoo.dto.GlobalResponseDto;
+import com.example.beepoo.dto.MapResponseDto;
 import com.example.beepoo.enums.AskTypeEnum;
 import com.example.beepoo.service.AskService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -76,7 +77,7 @@ public class AskController {
 
     // 요청 상태 조회
     @GetMapping("/type")
-    public GlobalResponseDto<Map<AskTypeEnum, String>> getAskType() {
+    public GlobalResponseDto<List<MapResponseDto<AskTypeEnum, String>>> getAskType() {
         return askService.getAskType();
     }
 }
