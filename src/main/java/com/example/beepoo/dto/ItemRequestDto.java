@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ItemRequestDto {
-
     private Integer seq;
+    private String departmentName;
     private String name;
     private String userName;
     private Long typeCode;

@@ -34,6 +34,7 @@ public class AskResponseDto {
     private AskTypeEnum askType;
     private String askUserName;
     private String confirmUserName;
+    private String departmentName;
 
     public AskResponseDto(Ask entity) {
         this.seq = entity.getSeq();
@@ -57,7 +58,8 @@ public class AskResponseDto {
         String itemType,
         AskTypeEnum askType,
         String askUserName,
-        String confirmUserName
+        String confirmUserName,
+        String departmentName
     ) {
         this.seq = seq;
         this.itemName = itemName;
@@ -65,5 +67,6 @@ public class AskResponseDto {
         this.askType = askType;
         this.askUserName = askUserName;
         this.confirmUserName = confirmUserName;
+        this.departmentName = departmentName;
     }
 }
